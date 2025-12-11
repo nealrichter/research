@@ -284,7 +284,7 @@ The Bluedot Impact AI Alignment course, Unit 6, focuses on "Mechanistic Interpre
 ### Technical AI Safety Course
 [https://bluedot.org/courses/technical-ai-safety](https://bluedot.org/courses/technical-ai-safety)
 
-The BlueDot Impact Technical AI Safety course aims to equip participants with the knowledge to build safer AI by understanding current safety techniques, identifying gaps, and contributing to the field. The course is designed for ML researchers, software engineers, and policy professionals, offering a structured overview of key safety techniques in approximately 30 hours. It covers topics such as the technical challenges of AI safety, training safer models, a community of individuals working to make AI go well.
+The BlueDot Impact Technical AI Safety course aims to equip participants with the knowledge to build safer AI by understanding current safety techniques, identifying gaps, and contributing to the field. The course is designed for ML researchers, software engineers, and policy professionals, offering a structured overview of key safety techniques in approximately 30 hours. It covers topics such as the technical challenges of AI safety, training safer models, detecting danger, understanding AI, and minimizing harm. The course operates on a "pay-what-you-want" model and provides access to a community of individuals working to make AI go well.
 
 **Facilitators:**
 *   Neel Nanda (Mech Interp Lead at Google DeepMind)
@@ -299,29 +299,46 @@ The BlueDot Impact Technical AI Safety course aims to equip participants with th
 
 # Conference Workshop
 
-## Mechanistic Interpretability Workshop (NeurIPS)
-[https://mechinterpworkshop.com/](https://mechinterpworkshop.com/)
+## 1st New England Mechanistic Interpretability (NEMI) Workshop
+[https://nemiconf.github.io/summer24/](https://nemiconf.github.io/summer24/)
 
-The Mechanistic Interpretability Workshop at NeurIPS 2025, scheduled for Sunday, December 7, 2025, at the San Diego Convention Centre, focuses on understanding the internal mechanisms of neural networks. The workshop aims to address the challenge of interpreting model decisions, which is crucial for predicting behavior, ensuring reliability, and detecting adversarial actions. It will bring together researchers from academia, industry, and independent research to discuss advancements, build common understanding, and define future directions in mechanistic interpretability. The event will feature keynote speakers and poster sessions, building on the success of the ICML 2024 workshop.
+The NEMI (New England Mechanistic Interpretability) workshop series is a one-day event for academic and industry researchers in New England focusing on mechanistic interpretability. The 2024 workshop will be held on August 19th at Northeastern University in Boston, MA. It invites submissions for talks and posters on all aspects of interpretability, particularly encouraging rising researchers from New England graduate programs. Submissions can be work in progress or already published, with extended abstracts not exceeding 500 words. Key deadlines include August 2nd for registration and August 9th for abstract submission.
+
+**Instructors/Organizers:**
+*   **Senior Organizing Committee:**
+    *   David Bau, Northeastern University
+    *   Max Tegmark, MIT
+*   **Student Organizing Committee:**
+    *   Koyena Pal, Northeastern University
+    *   Kenneth Li, Harvard
+    *   Eric Michaud, MIT
+    *   Jannik Brinkmann, University of Mannheim
+
+## 2nd New England Mechanistic Interpretability (NEMI) Workshop
+[https://nemiconf.github.io/summer25/](https://nemiconf.github.io/summer25/)
+
+The 2nd New England Mechanistic Interpretability (NEMI) Workshop, held on August 22, 2025, at Northeastern University, Boston, aims to unite academic and industry researchers in New England to advance mechanistic interpretability in machine learning. The workshop will feature keynote speakers, oral presentations, interactive poster sessions, and discussions on topics like neural circuit interpretability, activation patching, and model simplification. Registration closes on August 4, 2025, with submissions due by August 9, 2025.
 
 **Keynote Speakers:**
-*   Chris Olah (Interpretability Lead and Co-founder, Anthropic)
-*   Been Kim (Senior Staff Research Scientist, Google DeepMind)
-*   Sarah Schwettmann (Co-founder, Transluce)
-**Organizing Committee:**
-*   Neel Nanda (Senior Research Scientist, Google DeepMind)
-*   Andrew Lee (Post-doc, Harvard)
-*   Andy Arditi (PhD Student, Northeastern University)
-*   Jemima Jones (Operations Lead)
-*   Stefan Heimersheim (Member of Technical Staff, FAR.AI)
-*   Anna Soligo (PhD Student, Imperial)
-*   Martin Wattenberg (Professor, Harvard University & Principal Research Scientist, Google DeepMind)
-*   Atticus Geiger (Lead, Pr(Ai)²R Group)
-*   Julius Adebayo (Founder and Researcher, Guide Labs)
-*   Kayo Yin (3rd year PhD student, UC Berkeley)
-*   Fazl Barez (Senior Research Fellow, Oxford Martin AI Governance Initiative)
-*   Lawrence Chan (Researcher, METR)
-*   Matthew Wearden (London Director, MATS)
+*   Lee Sharkey (Goodfire)
+*   Tamar Rott Shaham (MIT)
+*   Aaron Mueller (Boston University)
+*   Ekdeep Singh Lubana (Harvard University)
+
+**Student Organizers:**
+*   Koyena Pal (Northeastern University)
+*   Alex Loftus (Northeastern University)
+*   Emma Bortz (Northeastern University)
+*   Aruna Sankaranarayanan (MIT)
+
+**Senior Program Committee:**
+*   David Bau (Northeastern University)
+*   Jacob Andreas (MIT)
+*   Himabindu Lakkaraju (Harvard University)
+*   Najoung Kim (Boston University)
+
+**Logistics Support:**
+*   Heather Sciacca (Northeastern University)
 
 ## ICML 2024
 [https://icml2024mi.pages.dev/](https://icml2024mi.pages.dev/)
@@ -342,3 +359,53 @@ The ICML 2024 Mechanistic Interpretability Workshop, held on July 27th in Vienna
 *   Kayo Yin (UC Berkeley)
 *   Neel Nanda (Google DeepMind)
 *   Max Tegmark (MIT)
+
+## ICML 2025 Workshop on Mechanistic Interpretability
+[https://icml.cc/virtual/2024/workshop/29953](https://icml.cc/virtual/2024/workshop/29953)
+
+The ICML 2025 Workshop on Mechanistic Interpretability is a one-day event focused on reverse-engineering trained neural networks to understand their learned algorithms and internal structure. The workshop includes talks, oral presentations, spotlight sessions, poster sessions, and a panel discussion. Key speakers include David Bau, Asma Ghandeharioun, and Chris Olah. The workshop aims to delve into various topics related to understanding the internal workings of AI models.
+
+**Organizers/Instructors:**
+*   Fazl Barez
+*   Lawrence Chan
+*   Mor Geva
+*   Kayo Yin
+*   Neel Nanda
+*   Max Tegmark
+
+## Mechanistic Interpretability Workshop (NeurIPS)
+[https://mechinterpworkshop.com/](https://mechinterpworkshop.com/)
+[https://mechinterpworkshop.com/schedule/](https://mechinterpworkshop.com/schedule/)
+
+The Mechanistic Interpretability Workshop at NeurIPS 2025, scheduled for Sunday, December 7, 2025, at the San Diego Convention Centre, focuses on understanding the internal mechanisms of neural networks. The workshop aims to address the challenge of interpreting model decisions, which is crucial for predicting behavior, ensuring reliability, and detecting adversarial actions. It will bring together researchers from academia, industry, and independent research to discuss advancements, build common understanding, and define future directions in mechanistic interpretability. The full-day program includes opening remarks, dedicated sessions for spotlight talks and poster presentations, and invited lightning talks. Topics of discussion include scalable end-to-end interpretability, the foundations of computation, pragmatic visions for interpretability, infrastructure for interpretability research, interpreting models with clever prompting, and funding opportunities in the field. The event will feature keynote speakers and poster sessions, building on the success of the ICML 2024 workshop.
+
+**Keynote Speakers:**
+*   Chris Olah (Interpretability Lead and Co-founder, Anthropic)
+*   Been Kim (Senior Staff Research Scientist, Google DeepMind)
+*   Sarah Schwettmann (Co-founder, Transluce)
+
+**Other Speakers/Organizing Committee:**
+*   Neel Nanda (Senior Research Scientist, Google DeepMind)
+*   Andrew Lee (Post-doc, Harvard)
+*   Andy Arditi (PhD Student, Northeastern University)
+*   Jemima Jones (Operations Lead)
+*   Stefan Heimersheim (Member of Technical Staff, FAR.AI)
+*   Anna Soligo (PhD Student, Imperial)
+*   Martin Wattenberg (Professor, Harvard University & Principal Research Scientist, Google DeepMind)
+*   Atticus Geiger (Lead, Pr(Ai)²R Group)
+*   Julius Adebayo (Founder and Researcher, Guide Labs)
+*   Kayo Yin (3rd year PhD student, UC Berkeley)
+*   Fazl Barez (Senior Research Fellow, Oxford Martin AI Governance Initiative)
+*   Lawrence Chan (Researcher, METR)
+*   Matthew Wearden (London Director, MATS)
+*   Ekdeep Singh Lubana (Goodfire)
+*   Adam Belfki (NDIF / Northeastern University)
+*   Rowan Wang (Anthropic)
+*   Josh Engels (Google DeepMind)
+*   Sheridan Feucht (Northeastern University)
+*   Uzay Macar (Anthropic Fellows)
+*   Leo Gao (OpenAI)
+*   Satvik Golechha & Sid Black (UK AISI)
+*   Bartosz Cywinski (MATS)
+*   David Bau (Northeastern University)
+*   Jake Mendel (Coefficient Giving)

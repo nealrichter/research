@@ -1,36 +1,33 @@
------
+---
 Stuff Found on X/Twitter
 
-https://x.com/NeelNanda5
-https://x.com/santiaranguri
-https://x.com/dbaek__
-https://x.com/bilalchughtai_
-https://x.com/ch402
-https://x.com/tegmark
-https://x.com/kate_saenko_
-https://x.com/aypan_17
-https://x.com/duynguyen772
-https://x.com/ExplainableML
-
-NeurIPS Mechanistic Interpretability Workshop Blog Post
-https://davidbau.com/archives/2025/12/09/in_defense_of_curiosity.html
+- https://x.com/NeelNanda5
+- https://x.com/santiaranguri
+- https://x.com/dbaek__
+- https://x.com/bilalchughtai_
+- https://x.com/ch402
+- https://x.com/tegmark
+- https://x.com/kate_saenko_
+- https://x.com/aypan_17
+- https://x.com/duynguyen772
+- https://x.com/ExplainableML
 
 
-@ElijahKurien
-Dec 8
-Put together the most information-dense blogs that introduced me to mechanistic interpretability below!
+-NeurIPS Mechanistic Interpretability Workshop Blog Post
+(https://davidbau.com/archives/2025/12/09/in_defense_of_curiosity.html)
+
+
+-@ElijahKurien Put together the most information-dense blogs that introduced me to mechanistic interpretability below!
 https://www.elijahkurien.com/interp
 
 Beautiful video on mechanistic interpretability and the "grokking" behavior of neural networks
-https://www.youtube.com/watch?v=D8GOeCFFby4&t=2s
+( https://www.youtube.com/watch?v=D8GOeCFFby4&t=2s )
 The most complex model we actually understand
-https://www.welchlabs.com/resources/ai-book-ezrzm 
+( https://www.welchlabs.com/resources/ai-book-ezrzm )
 
 
-Alex Pan
-Dec 13, 2024
-If you are interested in our work, read our paper and visit our website! Many thanks to my great collaborators 
-Paper: http://arxiv.org/abs/2412.08686
+- Alex Pan If you are interested in our work, read our paper and visit our website! Many thanks to my great collaborators 
+Paper: (http://arxiv.org/abs/2412.08686)
 	
 
 ---

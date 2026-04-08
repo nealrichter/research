@@ -52,6 +52,13 @@ This version provides the full technical treatment of modern alignment objective
 
 > **Note on Implementation:** If you are prioritizing the "Verifiable Rewards" (RLVR) aspect of your curriculum, the January 2026 Reasoning Model survey (2601.19928) contains the most current analysis on how RL stability is maintained when training models to generate their own internal reasoning chains.
 
+### Other Papers:
+**Title:** LLM Post-Training: A Deep Dive into Reasoning Large Language Models
+- **Release:** March 2025
+- **Authors:**  Komal Kumar, Tajamul Ashraf et al.
+[LLM Post-Training: A Deep Dive into Reasoning Large Language Models](https://arxiv.org/pdf/2502.21321)
+- **Paper reference collection**  [References](https://github.com/mbzuai-oryx/awesome-llm-post-training)
+
 ---
 
 ## Deep Dive on Steering: Q1 2026

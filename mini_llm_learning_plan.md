@@ -7,12 +7,12 @@
 
 **Focus:** Understanding the "brain" of the LLM — Transformer architecture, scaling laws, and pre-training on massive datasets.
 
-**Intro Course**
+**Intro Course** ⭐
 - DeepLearning.AI [Generative AI for Everyone](https://www.deeplearning.ai/courses/generative-ai-for-everyone/) — *Andrew Ng*
   - ⏱ ~3 hrs | Introductory overview of how generative AI works, its capabilities, limitations, and business impact. Hands-on prompt engineering exercises included.
   - October 2023
 
-**Course 1**
+**Course 1** ⭐
 - DeepLearning.AI [Pretraining LLMs](https://www.deeplearning.ai/short-courses/pretraining-llms/) — *Sung Kim, Lucy Park*
   - ⏱ ~1 hr | Covers data preparation, model configuration, and cost considerations for pretraining from scratch or continuing pretraining on custom data.
   - July 2024
@@ -35,12 +35,12 @@
 
 **Focus:** The post-training pipeline — transitioning from a raw base model to a helpful assistant using SFT, DPO, and RLHF.
 
-**Course 1**
+**Course 1** ⭐
 - DeepLearning.AI [Fine-tuning and Reinforcement Learning for LLMs: Intro to Post-Training](https://www.deeplearning.ai/courses/fine-tuning-and-reinforcement-learning-for-llms-intro-to-post-training/) — *Sharon Zhou (AMD)*
   - ⏱ ~1–2 hrs | 5-module course covering SFT, RLHF, PPO, GRPO, LoRA, evaluation/error analysis, synthetic data, and production pipelines. Built with AMD; methods are hardware-agnostic.
   - October 2025 *(older edition: [Finetuning Large Language Models](https://www.deeplearning.ai/short-courses/finetuning-large-language-models/), August 2023)*
 
-**Course 2**
+**Course 2** ⭐
 - DeepLearning.AI [Reinforcement Fine-Tuning LLMs with GRPO](https://learn.deeplearning.ai/courses/reinforcement-fine-tuning-llms-grpo/information) — *Travis Addair, Arnav Garg (Predibase)*
   - ⏱ ~1 hr 23 min | Technical deep dive into GRPO: reward function design, LLM-as-a-Judge, reward hacking, GRPO loss calculation, and fine-tuning for multi-step reasoning with minimal labeled data.
   - May 2025
@@ -66,7 +66,7 @@
 
 **Focus:** Observability, debugging, and evaluation of agent components. Covers testing examples, LLM-as-a-Judge, code-based evaluators, and structuring experiments to improve output quality.
 
-**Course 1**
+**Course 1** ⭐
 - DeepLearning.AI [Evaluating AI Agents](https://www.deeplearning.ai/short-courses/evaluating-ai-agents/) — *John Gilhuly, Aman Khan*
   - ⏱ ~1–2 hrs | Learn to add observability to agents, set up evaluations with code-based and LLM-as-a-Judge approaches, and structure experiments to improve quality.
   - [GitHub: Evaluating AI Agents](https://github.com/ksm26/Evaluating-AI-Agents)
@@ -77,7 +77,7 @@
   - ⏱ ~1 hr 6 min | Hands-on evaluation frameworks using LangSmith, Patronus, and PromptLayer. Covers quality, performance, and cost metrics plus A/B testing and production monitoring.
   - April 2025
 
-**Course 3**
+**Course 3** ⭐
 - DeepLearning.AI [Improving Accuracy of LLM Applications](https://www.deeplearning.ai/short-courses/improving-accuracy-of-llm-applications/) — *Sharon Zhou, Amit Sangani*
   - ⏱ ~1–2 hrs | Systematic approach to diagnosing and fixing inconsistent LLM outputs — covers evaluation pipelines, prompt iteration, and reliability techniques.
   - August 2024
@@ -95,7 +95,7 @@
 
 **Long Courses**
 
-**Course 1**
+**Course 1** ⭐
 - DeepLearning.AI [Agentic AI](https://learn.deeplearning.ai/courses/agentic-ai/information) — *Andrew Ng*
   - ⏱ ~8 hrs | Teaches the four core agentic design patterns (Reflection, Tool Use, Planning, Multi-Agent Orchestration) built from first principles in Python before introducing frameworks.
   - October 2025
@@ -104,12 +104,12 @@
 
 ## Module 5: Agents & App Building on Amazon Bedrock
 
-**Course 1**
+**Course 1** ⭐
 - DeepLearning.AI [Serverless Agentic Workflows with Amazon Bedrock](https://www.deeplearning.ai/short-courses/serverless-agentic-workflows-with-amazon-bedrock/) — *Mike Chambers (AWS)*
   - ⏱ ~1 hr | Build and deploy a serverless agentic application with tools, code execution, and guardrails. Includes a hands-on customer service bot example.
   - October 2024
 
-**Course 2**
+**Course 2** ⭐
 - Udemy [Amazon Bedrock AgentCore: Build & Deploy any AI Agent on AWS](https://www.udemy.com/course/amazon-bedrock-agentcore-build-ai-agents-on-aws-hands-on/) — *Rahul Trisal*
   - ⏱ ~5 hrs 35 min | Hands-on deployment of agentic apps using AgentCore Runtime + Lambda + API Gateway. Covers observability (OpenTelemetry/CloudWatch), memory, identity, and gateway.
   - April 2026
@@ -157,7 +157,14 @@
   - ⏱ ~9 hrs 15 min | Covers MLOps fundamentals and all 4 MLflow components: Tracking, Model, Projects, and Registry. Includes end-to-end project deploying a model to AWS SageMaker with MLflow integration.
   - June 2025
 
-**Course 2**
+**Course 2** ⭐
+- Udemy [MLOps Fundamentals: The Complete Guide to ML in Production](https://www.udemy.com/course/mlops-fundamentals-the-complete-guide-to-ml-in-production/) — *Data Universe, DCDG Partners*
+  - ⏱ ~2 hrs 20 min | Conceptual overview of the full MLOps lifecycle: pipelines, CI/CD for ML, platform comparison (SageMaker, Vertex AI, Azure ML, MLflow, Kubeflow), monitoring, retraining, team roles, governance KPIs, and ROI. Includes real-world case studies (recommendations, fraud detection, churn).
+  - April 2026
+
+**Long Courses**
+
+**Course 3**
 - Coursera/KodeKloud [Hands-On MLOps Fundamentals for ML Engineers Specialization](https://www.coursera.org/specializations/fundamentals-of-mlops) — *Mumshad Mannambeth*
   - ⏱ ~12 hrs total | 3-course specialization:
     - **Course 1** (5 hrs) — Data Engineering Essentials: Spark, Kafka, Airflow, Prefect, feature stores
@@ -165,11 +172,6 @@
     - **Course 3** (4 hrs) — Deploy ML Models to Production: BentoML serving, CI/CD/CT, governance (GDPR/HIPAA), monitoring
   - Capstone: end-to-end insurance claim processing pipeline with MLflow + BentoML + Flask
   - March 2026
-
-**Course 3**
-- Udemy [MLOps Fundamentals: The Complete Guide to ML in Production](https://www.udemy.com/course/mlops-fundamentals-the-complete-guide-to-ml-in-production/) — *Data Universe, DCDG Partners*
-  - ⏱ ~2 hrs 20 min | Conceptual overview of the full MLOps lifecycle: pipelines, CI/CD for ML, platform comparison (SageMaker, Vertex AI, Azure ML, MLflow, Kubeflow), monitoring, retraining, team roles, governance KPIs, and ROI. Includes real-world case studies (recommendations, fraud detection, churn).
-  - April 2026
 
 ---
 

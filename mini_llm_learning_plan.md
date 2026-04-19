@@ -113,17 +113,29 @@
   - ⏱ ~5 hrs 35 min | Hands-on deployment of agentic apps using AgentCore Runtime + Lambda + API Gateway. Covers observability (OpenTelemetry/CloudWatch), memory, identity, and gateway.
   - April 2026
 
+**Course 5**
+- Coursera/AWS [Amazon Bedrock Customization, Optimization & Automation](https://www.coursera.org/learn/amazon-bedrock-customization-optimization-automation) — *Russell Sayers, Alex G., Morgan Willis (AWS)*
+  - ⏱ ~5 hrs | 2 modules:
+    - **Module 1** — Fine-tuning, continued pre-training, model distillation, LangChain integration
+    - **Module 2** — Bedrock Evaluation Jobs, prompt caching & routing, Bedrock Data Automation, Amazon Q Developer CLI
+  - Part of the *AWS Generative AI and AI Agents with Amazon Bedrock* Professional Certificate | July 2025
+
 **Course 4** *(supplemental — Python & TypeScript, embeddings/image models)*
 - Udemy [Amazon Bedrock - The Complete Guide to AWS Generative AI](https://www.udemy.com/course/amazon-bedrock-aws-generative-ai/) — *Alex Dan, Bryan Krausen*
   - ⏱ ~8 hrs 3 min | End-to-end Bedrock course in Python and TypeScript. Covers text/image/embedding models, RAG with Knowledge Bases, LangChain integration, fine-tuning, and deploying APIs with Lambda + API Gateway.
   - April 2026
 
 **Projects**
-- [2026 Complete AWS Bedrock Generative AI Course + Projects](https://www.udemy.com/course/complete-aws-bedrock-generative-ai-course-projects)
+- Udemy [2026 Complete AWS Bedrock Generative AI Course + Projects](https://www.udemy.com/course/complete-aws-bedrock-generative-ai-course-projects)
   - March 2026
+- Coursera/Packt [Build Real-World End-to-End AI Agents using AWS Bedrock](https://www.coursera.org/learn/packt-build-real-world-end-to-end-ai-agents-using-aws-bedrock-bckaq) — *Packt*
+  - ⏱ ~10 hrs | 10-module hands-on course: RAG, KnowledgeBases, Bedrock Agents, multi-agent collaboration, Lambda/DynamoDB integration, Redshift as structured data source, and Bedrock Flows for workflow orchestration.
+  - February 2026
 
 **Reference**
 - [GitHub: Amazon Bedrock Samples](https://github.com/aws-samples/amazon-bedrock-samples)
+- AWS Blog: [Reinforcement Fine-Tuning on Amazon Bedrock: Best Practices](https://aws.amazon.com/blogs/machine-learning/reinforcement-fine-tuning-on-amazon-bedrock-best-practices/) — *Nick McCarthy, Sapana Chaudhary, Shreyas Subramanian, Jennifer Zhu* | April 8, 2026
+  - Covers RFT use cases (RLVR, RLAIF), dataset design, reward function strategy, hyperparameter tuning, and common pitfalls (reward hacking, instability).
 
 ---
 

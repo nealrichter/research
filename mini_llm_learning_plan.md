@@ -1,5 +1,5 @@
-# Self-Study AI Engineering Curriculum
-### Architecture, Post-Training & Agents
+# LLM to Agents: A Self-Study AI Engineering Roadmap
+### From Transformer Architecture & Pre-training → Post-Training & Alignment → Evaluation & Observability → Agentic Systems → Production Deployment on AWS
 
 ---
 

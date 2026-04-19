@@ -3,6 +3,25 @@
 
 ---
 
+## ⭐ Recommended Starting Sequence
+
+A focused ~27-hour path that builds understanding progressively — from how LLMs work, to aligning and evaluating them, to deploying autonomous agents in production.
+
+1. **Generative AI for Everyone** *(M1 Intro, ~3 hrs)* — Conceptual foundation: how LLMs work, what they can and can't do, business impact. → [link](#intro-course-)
+2. **Pretraining LLMs** *(M1 C1, ~1 hr)* — How base models are built: data, configuration, and cost of pretraining. → [link](#course-1-)
+3. **Fine-tuning and RL for LLMs: Intro to Post-Training** *(M2 C1, ~1–2 hrs)* — SFT, RLHF, GRPO, LoRA: turning a base model into a production assistant. → [link](#course-1--1)
+4. **Reinforcement Fine-Tuning LLMs with GRPO** *(M2 C2, ~1 hr 23 min)* — Deep dive into GRPO reward functions and reasoning fine-tuning. → [link](#course-2--1)
+5. **Evaluating AI Agents** *(M3 C1, ~1–2 hrs)* — How to measure, debug, and improve agent behavior with LLM-as-a-Judge and code-based evals. → [link](#course-1--2)
+6. **Improving Accuracy of LLM Applications** *(M3 C3, ~1–2 hrs)* — Systematic reliability: diagnosing inconsistency and building evaluation pipelines. → [link](#course-3--1)
+7. **Agentic AI** *(M4 C1, ~8 hrs)* — The four agentic design patterns (Reflection, Tool Use, Planning, Multi-Agent) in pure Python. → [link](#course-1--3)
+8. **Serverless Agentic Workflows with Amazon Bedrock** *(M5 C1, ~1 hr)* — Deploy a production agent on AWS with guardrails and serverless architecture. → [link](#course-1--4)
+9. **Amazon Bedrock AgentCore** *(M5 C2, ~5 hrs 35 min)* — Production-grade deployment with observability, memory, and gateway. → [link](#course-2--4)
+10. **MLOps Fundamentals** *(M6 C2, ~2 hrs 20 min)* — ML lifecycle in production: pipelines, monitoring, governance, and platform landscape. → [link](#course-2--5)
+
+**Total estimated time: ~27–28 hours**
+
+---
+
 ## Module 1: Build — LLM Architecture & Pre-training
 
 **Focus:** Understanding the "brain" of the LLM — Transformer architecture, scaling laws, and pre-training on massive datasets.

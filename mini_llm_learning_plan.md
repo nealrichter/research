@@ -22,7 +22,9 @@
   - ⏱ ~1–2 hrs | Implement and train a 20M-parameter MiniGPT-style model from scratch using JAX and Flax/NNX — the library powering Google's Gemini.
   - March 2026
 
-**Course 3: Long Survey**
+**Long Courses**
+
+**Course 3**
 - Coursera/DeepLearning.AI [Generative AI with Large Language Models](https://learn.deeplearning.ai/courses/generative-ai-with-llms/information) — *AWS Team & DeepLearning.AI*
   - ⏱ ~16 hrs | Deep dive into the full LLM lifecycle: Transformer architecture, pre-training, fine-tuning, RLHF, scaling laws, and deployment. Intermediate Python required.
   - October 2025
@@ -50,6 +52,8 @@
 - Hugging Face [Fine-tune an LLM for Function Calling](https://huggingface.co/learn/agents-course/bonus-unit1/introduction) — *Hugging Face*
   - ⏱ Self-paced module | Practical bonus unit on fine-tuning an open-source LLM specifically for structured tool/function-calling behavior.
   - [GitHub](https://github.com/huggingface/agents-course/blob/main/units/en/bonus-unit1/introduction.mdx) — February 2025
+
+**Long Courses**
 
 **Course 4**
 - Udemy [LLM Mastery: Hands-on Code, Align and Master LLMs](https://www.udemy.com/course/llm-mastery-hands-on-code-align-and-master-llms/) — *Javier Ideami*
@@ -89,6 +93,8 @@
 
 **Focus:** Giving the model hands and autonomy — Reflection, Tool Use, Planning, and Multi-Agent Orchestration. *(Currently free)*
 
+**Long Courses**
+
 **Course 1**
 - DeepLearning.AI [Agentic AI](https://learn.deeplearning.ai/courses/agentic-ai/information) — *Andrew Ng*
   - ⏱ ~8 hrs | Teaches the four core agentic design patterns (Reflection, Tool Use, Planning, Multi-Agent Orchestration) built from first principles in Python before introducing frameworks.
@@ -104,29 +110,32 @@
   - October 2024
 
 **Course 2**
-- Udemy [Amazon Bedrock: Generative AI, AI Agents, MCP, EVALs, RAG](https://udemy.com/course/mastering-aws-bedrock-build-intelligent-genai-applications/)
-  - ⏱ ~8 hrs 14 min | Comprehensive Bedrock course covering Knowledge Bases with vector embeddings, Agents with Action Groups, Prompt Management, Guardrails, and open-source frameworks (CrewAI).
-  - December 2025
-
-**Course 3**
 - Udemy [Amazon Bedrock AgentCore: Build & Deploy any AI Agent on AWS](https://www.udemy.com/course/amazon-bedrock-agentcore-build-ai-agents-on-aws-hands-on/) — *Rahul Trisal*
   - ⏱ ~5 hrs 35 min | Hands-on deployment of agentic apps using AgentCore Runtime + Lambda + API Gateway. Covers observability (OpenTelemetry/CloudWatch), memory, identity, and gateway.
   - April 2026
 
-**Course 5**
+**Course 3**
 - Coursera/AWS [Amazon Bedrock Customization, Optimization & Automation](https://www.coursera.org/learn/amazon-bedrock-customization-optimization-automation) — *Russell Sayers, Alex G., Morgan Willis (AWS)*
   - ⏱ ~5 hrs | 2 modules:
     - **Module 1** — Fine-tuning, continued pre-training, model distillation, LangChain integration
     - **Module 2** — Bedrock Evaluation Jobs, prompt caching & routing, Bedrock Data Automation, Amazon Q Developer CLI
   - Part of the *AWS Generative AI and AI Agents with Amazon Bedrock* Professional Certificate | July 2025
 
-**Course 4** *(supplemental — Python & TypeScript, embeddings/image models)*
+**Long Courses**
+
+**Course 4**
+- Udemy [Amazon Bedrock: Generative AI, AI Agents, MCP, EVALs, RAG](https://udemy.com/course/mastering-aws-bedrock-build-intelligent-genai-applications/)
+  - ⏱ ~8 hrs 14 min | Comprehensive Bedrock course covering Knowledge Bases with vector embeddings, Agents with Action Groups, Prompt Management, Guardrails, and open-source frameworks (CrewAI).
+  - December 2025
+
+**Course 5** *(supplemental — Python & TypeScript, embeddings/image models)*
 - Udemy [Amazon Bedrock - The Complete Guide to AWS Generative AI](https://www.udemy.com/course/amazon-bedrock-aws-generative-ai/) — *Alex Dan, Bryan Krausen*
   - ⏱ ~8 hrs 3 min | End-to-end Bedrock course in Python and TypeScript. Covers text/image/embedding models, RAG with Knowledge Bases, LangChain integration, fine-tuning, and deploying APIs with Lambda + API Gateway.
   - April 2026
 
 **Projects**
-- Udemy [2026 Complete AWS Bedrock Generative AI Course + Projects](https://www.udemy.com/course/complete-aws-bedrock-generative-ai-course-projects)
+- Udemy [2026 Complete AWS Bedrock Generative AI Course + Projects](https://www.udemy.com/course/complete-aws-bedrock-generative-ai-course-projects) — *Patrik Szepesi*
+  - ⏱ ~14 hrs 31 min | 6 real-world projects: meeting summarization, code generation, image generation, multi-agent system, voice AI agent (Nova Sonic), and web search agent with memory (Strands + DuckDuckGo). Covers AgentCore deployment, RFT, prompt management, batch inference, and short/long-term agent memory.
   - March 2026
 - Coursera/Packt [Build Real-World End-to-End AI Agents using AWS Bedrock](https://www.coursera.org/learn/packt-build-real-world-end-to-end-ai-agents-using-aws-bedrock-bckaq) — *Packt*
   - ⏱ ~10 hrs | 10-module hands-on course: RAG, KnowledgeBases, Bedrock Agents, multi-agent collaboration, Lambda/DynamoDB integration, Redshift as structured data source, and Bedrock Flows for workflow orchestration.

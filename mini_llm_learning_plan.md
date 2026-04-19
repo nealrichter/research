@@ -74,7 +74,11 @@
 
 **Focus:** Giving the model hands and autonomy — Reflection, Tool Use, Planning, and Multi-Agent Orchestration using pure Python (no framework abstractions). *(Currently free)*
 
-**Course**
+**Course 1**
+- [Functions, Tools and Agents with LangChain](https://www.deeplearning.ai/short-courses/functions-tools-agents-langchain/) — *Harrison Chase (LangChain)*
+  - ⏱ ~1 hr 44 min | Covers OpenAI function calling, LangChain Expression Language (LCEL), tagging, data extraction, tool selection, routing, and building a conversational agent.
+
+**Course 2**
 - [Agentic AI](https://www.deeplearning.ai/short-courses/agentic-ai/) — *Andrew Ng*
   - ⏱ ~8 hrs | Teaches the four core agentic design patterns (Reflection, Tool Use, Planning, Multi-Agent Orchestration) built from first principles in Python before introducing frameworks.
 

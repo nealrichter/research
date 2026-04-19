@@ -148,6 +148,31 @@
 
 ---
 
+## Module 6: MLOps
+
+**Focus:** Operationalizing ML models — experiment tracking, model packaging, versioning, deployment, and production workflows.
+
+**Course 1**
+- Udemy [MLflow in Action - Master the art of MLOps using MLflow](https://www.udemy.com/course/mlflow-course/) — *J Garg - Real Time Learning*
+  - ⏱ ~9 hrs 15 min | Covers MLOps fundamentals and all 4 MLflow components: Tracking, Model, Projects, and Registry. Includes end-to-end project deploying a model to AWS SageMaker with MLflow integration.
+  - June 2025
+
+**Course 2**
+- Coursera/KodeKloud [Hands-On MLOps Fundamentals for ML Engineers Specialization](https://www.coursera.org/specializations/fundamentals-of-mlops) — *Mumshad Mannambeth*
+  - ⏱ ~12 hrs total | 3-course specialization:
+    - **Course 1** (5 hrs) — Data Engineering Essentials: Spark, Kafka, Airflow, Prefect, feature stores
+    - **Course 2** (3 hrs) — ML Model Development & Tracking: MLflow experiment tracking, model registry, hyperparameter tuning
+    - **Course 3** (4 hrs) — Deploy ML Models to Production: BentoML serving, CI/CD/CT, governance (GDPR/HIPAA), monitoring
+  - Capstone: end-to-end insurance claim processing pipeline with MLflow + BentoML + Flask
+  - March 2026
+
+**Course 3**
+- Udemy [MLOps Fundamentals: The Complete Guide to ML in Production](https://www.udemy.com/course/mlops-fundamentals-the-complete-guide-to-ml-in-production/) — *Data Universe, DCDG Partners*
+  - ⏱ ~2 hrs 20 min | Conceptual overview of the full MLOps lifecycle: pipelines, CI/CD for ML, platform comparison (SageMaker, Vertex AI, Azure ML, MLflow, Kubeflow), monitoring, retraining, team roles, governance KPIs, and ROI. Includes real-world case studies (recommendations, fraud detection, churn).
+  - April 2026
+
+---
+
 ## Archive — Superseded / Overlapping Courses
 
 *These courses are retained for reference but are largely covered by newer entries above.*

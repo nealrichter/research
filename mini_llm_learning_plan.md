@@ -148,7 +148,7 @@
 
 ---
 
-## Module 6: MLOps
+## Module 6: MLOps with MLflow
 
 **Focus:** Operationalizing ML models — experiment tracking, model packaging, versioning, deployment, and production workflows.
 

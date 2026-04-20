@@ -48,6 +48,12 @@ A focused ~27-hour path that builds understanding progressively — from how LLM
   - ⏱ ~16 hrs | Deep dive into the full LLM lifecycle: Transformer architecture, pre-training, fine-tuning, RLHF, scaling laws, and deployment. Intermediate Python required.
   - October 2025
 
+**Background / Optional**
+
+- DeepLearning.AI [Attention in Transformers: Concepts and Code in PyTorch](https://www.deeplearning.ai/short-courses/attention-in-transformers-concepts-and-code-in-pytorch/) — *Josh Starmer (StatQuest)*
+  - ⏱ ~1 hr 6 min | Clearly explains the attention mechanism from first principles: Query/Key/Value matrices, self-attention, masked self-attention, cross-attention, and multi-head attention, with PyTorch code.
+  - February 2025
+
 ---
 
 ## Module 2: Post-Training
@@ -77,6 +83,11 @@ A focused ~27-hour path that builds understanding progressively — from how LLM
 **Course 4**
 - Udemy [LLM Mastery: Hands-on Code, Align and Master LLMs](https://www.udemy.com/course/llm-mastery-hands-on-code-align-and-master-llms/) — *Javier Ideami*
   - ⏱ ~18 hrs 44 min | Build an LLM from scratch in Python/PyTorch, code an alignment process (DPO-style), fine-tune with QLoRA, and explore attention mechanisms through advanced visualizations.
+
+**Background / Optional**
+
+- DeepLearning.AI [Function-Calling and Data Extraction with LLMs](https://www.deeplearning.ai/short-courses/function-calling-and-data-extraction-with-llms/) — *Jiantao Jiao, Venkat Srinivasan (Nexusflow)*
+  - ⏱ ~59 min | Covers function-calling mechanics, parallel/nested calls, OpenAPI specs, structured data extraction, and an end-to-end customer service transcript processing app using NexusRavenV2-13B.
   - February 2026
 
 ---
@@ -207,6 +218,8 @@ A focused ~27-hour path that builds understanding progressively — from how LLM
 **Module 4 — Agentic Systems**
 - DeepLearning.AI [Functions, Tools and Agents with LangChain](https://www.deeplearning.ai/short-courses/functions-tools-agents-langchain/) — *Harrison Chase (LangChain)* | October 2023
   - Tool use and agent patterns now covered more broadly in Module 4 Course 1 (Agentic AI). LangChain-specific LCEL syntax is dated.
+- DeepLearning.AI [Multi AI Agent Systems with crewAI](https://www.deeplearning.ai/short-courses/multi-ai-agent-systems-with-crewai/) — *João Moura (crewAI)* | May 2024 | ~2 hrs 41 min
+  - Framework-specific crewAI course covering role-playing, memory, tools, guardrails, and multi-agent collaboration. Superseded by Module 4 Course 1 (Agentic AI), which teaches the same patterns from first principles without framework lock-in.
 
 **Module 5 — Amazon Bedrock**
 - DeepLearning.AI [Serverless LLM Apps with Amazon Bedrock](https://www.deeplearning.ai/short-courses/serverless-llm-apps-amazon-bedrock/) — *Mike Chambers (AWS)* | February 2024

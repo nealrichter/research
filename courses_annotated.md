@@ -13,37 +13,12 @@ CS 6340, "Natural Language Processing," is a graduate-level course at the Univer
 
 **Instructor:** Ana Marasović
 
-### Mechanistic Interpretability Seminar
-[https://utah-mechanistic-interpretability.notion.site](https://utah-mechanistic-interpretability.notion.site)
-
-The University of Utah offers a "Mechanistic Interpretability Seminar" taught by Assistant Professor Ana Marasović. This seminar focuses on the emerging field of mechanistic interpretability, which aims to understand the internal workings of large language models and other complex neural networks. While the search results don't provide a detailed syllabus, the seminar is part of the university's broader AI-related course offerings, which include PhD and MS tracks in Artificial Intelligence and a Deep Learning Certificate.
-
-**Instructor:** Ana Marasović
-
 ### Machine Learning (CS 6350, DS 4350)
 [https://svivek.com/teaching/machine-learning/spring2025/lectures.html](https://svivek.com/teaching/machine-learning/spring2025/lectures.html)
 
 This course presents a tentative lecture schedule for a Machine Learning course (CS 6350, DS 4350) in Spring 2025. The curriculum spans a wide array of topics, beginning with an introduction to supervised learning, decision trees, and linear models. Subsequent lectures delve into online learning, the Perceptron algorithm, and computational learning theory, including PAC learning and VC dimension. The course also covers advanced machine learning techniques such as boosting, Support Vector Machines (SVMs), stochastic gradient descent, and risk minimization. Further topics include Bayesian learning, logistic regression, neural networks, and nearest neighbor classification. Practical aspects of machine learning are integrated through tutorials on tools like `sklearn` and guidance on building ML applications. The course structure includes homework assignments, project checkpoints, a midterm exam, and a final exam.
 
 **Instructor:** Not explicitly listed.
-
-## Duke
-
-### Explainable AI (XAI) Specialization
-[https://www.coursera.org/specializations/explainable-artificial-intelligence-xai](https://www.coursera.org/specializations/explainable-artificial-intelligence-xai)
-
-The Explainable AI (XAI) Specialization by Duke University on Coursera focuses on building ethical and transparent AI systems. It teaches professionals to master explainability techniques and ethical AI development to create trustworthy machine learning solutions. The program, a 3-course series, covers XAI concepts, interpretable machine learning, and advanced explainability techniques for large language models (LLMs) and computer vision models, utilizing hands-on Python labs. It is designed for individuals with a basic to intermediate understanding of machine learning.
-
-**Instructor:** Brinnae Bent, PhD.
-
-## Boston College
-
-### MT875: Mechanistic Interpretability
-[https://sites.google.com/bc.edu/eli-grigsby/mt875-mechanistic-interpretability](https://sites.google.com/bc.edu/eli-grigsby/mt875-mechanistic-interpretability)
-
-The course "MT875: Mechanistic Interpretability" for Fall 2024, taught by Eli Grigsby, delves into the geometric aspects of deep learning theory. It investigates how human-interpretable concepts are represented in data encodings' geometry and their interaction with neural network components. A key focus is on the mechanistic interpretability of transformers, the architecture behind large language models. Topics include the geometry and combinatorics of feedforward ReLU neural networks, their universal approximation capabilities, the superposition hypothesis, sequence-to-sequence architectures, geometric distortion, and symmetries in overparameterized ReLU networks. The course is aimed at graduate students and advanced undergraduates in mathematics and theoretical computer science, requiring a strong foundation in undergraduate mathematics and preferably graduate-level geometry and topology. Coursework involves either a lecture/tutorial or experimental work with visualizations.
-
-**Instructor:** Eli Grigsby
 
 ## UMass Amherst
 
@@ -56,7 +31,7 @@ This page describes CS 685, Advanced Natural Language Processing, offered in Spr
 *   Instructor: Mohit Iyyer
 *   TAs: Chau Pham, Yekyung Kim, Katherine Thai (remote), Saurabh Bajaj
 
-## Berekely
+## Berkeley
 
 ### CS294/194-280 Advanced Large Language Model Agents
 [https://rdi.berkeley.edu/adv-llm-agents/sp25](https://rdi.berkeley.edu/adv-llm-agents/sp25)
@@ -96,19 +71,6 @@ The 6.861* Quantitative Methods for NLP – Advanced NLP course, offered in Fall
 The "MIT FUTURE OF AI" website details a non-technical lecture series, 6.S087: Foundation Models & Generative AI, focusing on recent advancements in AI, specifically foundation models and generative AI. The course explores topics like LLMs, agents, text-to-video, self-driving cars, and DNA to proteins, examining their practical and foundational implications across science and business. It is accessible to all backgrounds. The lectures, which began on January 9th, are held on Tuesdays and Thursdays.
 
 **Instructor:** Rickard Brüel Gabrielsson, an MIT researcher and entrepreneur specializing in foundation models and generative AI.
-
-## Harvard
-
-### Explainable AI Course: From Simple Predictors to Complex Generative Models
-[https://interpretable-ml-class.github.io/](https://interpretable-ml-class.github.io/)
-
-This Harvard University Spring 2023 course, "Explainable AI Course: From Simple Predictors to Complex Generative Models," focuses on the emerging field of eXplainable Artificial Intelligence (XAI). The curriculum emphasizes the importance of understanding machine learning model behavior, especially in high-stakes domains like healthcare and finance, to ensure reliable decision-making. The course delves into seminal position papers, explores the concept of explainability from various end-user perspectives (e.g., doctors, ML researchers), and discusses different classes of interpretable models and post-hoc explanations. These include rule-based and prototype-based models, feature attributions, counterfactual explanations, and mechanistic interpretability. Furthermore, the course examines the intricate connections between explainability and crucial aspects such as fairness, robustness, and privacy. It also incorporates the latest research on interpreting large generative models, including large language models like GPT-3 and diffusion models like DALLE 2, highlighting the unique opportunities and challenges associated with these advanced systems. Students are expected to have a strong foundation in basic linear algebra, probability, algorithms, and machine learning. Proficiency in programming and software engineering, particularly with Python, numpy, and sklearn, is also a prerequisite for the course.
-
-**Instructors:**
-*   Hima Lakkaraju
-*   Ike Lage
-*   Jiaqi Ma
-*   Suraj Srinivas
 
 # AI Training Org
 
@@ -200,212 +162,3 @@ The DeepLearning.AI course "Post-training of LLMs" focuses on fine-tuning pre-tr
 *   Oleksii Kuchaiev (Nvidia)
 *   Jiantao Jiao (UC Berkeley)
 *   Esmaeil Gargari (DeepLearning.AI)
-
-## Neel Nanda
-
-### A Barebones Guide to Mechanistic Interpretability Prerequisites
-[https://www.neelnanda.io/mechanistic-interpretability/prereqs](https://www.neelnanda.io/mechanistic-interpretability/prereqs)
-
-The article "A Barebones Guide to Mechanistic Interpretability Prerequisites" by Neel Nanda and co-authored by Jess Smith, outlines essential skills for understanding and contributing to mechanistic interpretability in AI. It aims to demystify the field, suggesting that many overestimate the required core skills. The guide covers core mathematical concepts like linear algebra (basis, change of basis, vector spaces, matrices as linear maps, SVD, eigenvalues/eigenvectors) and probability basics (distributions, expected value, log likelihood, random variables, central limit theorem). Calculus basics, including gradients and the chain rule for understanding backpropagation, are also highlighted. For coding, the guide emphasizes Python basics, NumPy, and PyTorch, recommending resources like Al Sweigart's books and Andrej Karpathy's neural net video. It specifically advises learning `einops` and `einsum` for efficient tensor manipulation in PyTorch. A deep understanding of transformer architecture is deemed crucial, with Neel Nanda's own tutorials and explainer as recommended resources. The article encourages hands-on coding and direct engagement with research ideas over mastering every "nice-to-have" skill.
-
-**Instructors:**
-*   Neel Nanda
-*   Jess Smith
-
-### How To Become A Mechanistic Interpretability Researcher
-[https://www.alignmentforum.org/posts/jP9KDyMkchuv6tHwm/how-to-become-a-mechanistic-interpretability-researcher](https://www.alignmentforum.org/posts/jP9KDyMkchuv6tHwm/how-to-become-a-mechanistic-interpretability-researcher)
-
-The article "How To Become A Mechanistic Interpretability Researcher" by Neel Nanda provides a comprehensive guide for aspiring researchers in mechanistic interpretability (mech interp). Nanda emphasizes a "learn by doing" philosophy, advocating for minimal initial learning followed by immediate engagement in research. The process is broken down into three stages: "Learning the Ropes" (≤1 month) focusing on breadth-first basics like coding transformers, understanding key techniques, and using LLMs as learning tools; "Mini-projects" (1-5 days each for 2-4 weeks) to practice fast-feedback loop skills like exploration and understanding; and "Towards full projects" (1-2 week sprints) to develop deeper research skills, critical skepticism, and effective write-ups. The guide stresses the importance of practical experience, extensive use of LLMs for learning and coding, and proactive mentorship seeking. It also discusses the evolving landscape of mech interp, advising against fads and highlighting promising new directions like downstream tasks and model organisms for safety research.
-
-**Instructor:** Neel Nanda
-
-## BlueDot Impact
-
-### AI Alignment: Unit 6 | Resources: Mechanistic interpretability
-[https://bluedot.org/courses/alignment/6/1](https://bluedot.org/courses/alignment/6/1)
-
-The Bluedot Impact AI Alignment course, Unit 6, focuses on "Mechanistic Interpretability," which explores methods to understand the internal reasoning and decision-making processes of AI models. The unit emphasizes the growing need for transparency in advanced AI systems. Key topics include analyzing models' learned representations and weights through techniques like circuit analysis, and addressing challenges such as superposition using dictionary learning. By the end of a unit, participants should grasp what mechanistic interpretability is, its relevance to AI Alignment, and core concepts like circuits and superposition.
-
-**Instructors/Authors mentioned in the resources:**
-*   Sarah Hastings-Woodhouse
-*   Chris Olah
-*   Nick Cammarata
-*   Ludwig Schubert
-*   Scott Alexander
-*   Neel Nanda
-*   Charbel-Raphael Segerie
-*   Callum McDougall
-*   Nelson Elhage
-*   Tristan Hume
-*   Catherine Olsson
-*   Ryan Greenblatt
-*   Buck Shlegeris
-*   Trenton Bricken
-*   Adly Templeton
-*   Joshua Batson
-*   Kevin Wang
-*   Alexandre Variengien
-*   Arthur Conmy
-*   Gabriel Goh
-*   Chelsea Voss
-*   Tom Conerly
-*   Hamish Doodles
-*   Daniel Filan
-*   Kevin Meng
-*   David Bau
-*   Alex Andonian
-*   Jesse Hoogland
-*   Alexander Gietelink
-*   Daniel Murfet
-*   Tolga Bolukbasi
-*   Adam Pearce
-*   Ann Yuan
-*   Adrià Garriga-Alonso
-*   Nicholas Goldowsky-Dill
-*   Paul Christiano
-*   Ajeya Cotra
-*   Mark Xu
-*   Collin Burns
-*   Haotian Ye
-*   Dan Klein
-*   Kenneth Li
-*   Oam Patel
-*   Casper
-*   Robert Wiblin
-*   Keiran Harris
-*   Evan Hubinger
-*   Steven Byrnes
-*   Steven Liu
-*   Tongzhou Wang
-*   Been Kim
-*   Martin Wattenberg
-*   Justin Gilmer
-
-### Technical AI Safety Course
-[https://bluedot.org/courses/technical-ai-safety](https://bluedot.org/courses/technical-ai-safety)
-
-The BlueDot Impact Technical AI Safety course aims to equip participants with the knowledge to build safer AI by understanding current safety techniques, identifying gaps, and contributing to the field. The course is designed for ML researchers, software engineers, and policy professionals, offering a structured overview of key safety techniques in approximately 30 hours. It covers topics such as the technical challenges of AI safety, training safer models, detecting danger, understanding AI, and minimizing harm. The course operates on a "pay-what-you-want" model and provides access to a community of individuals working to make AI go well.
-
-**Facilitators:**
-*   Neel Nanda (Mech Interp Lead at Google DeepMind)
-*   Marius Hobbhahn (CEO at Apollo Research)
-*   Richard Ngo (Former OpenAI and DeepMind, AI Alignment Course Designer)
-*   Adam Jones (Member of Technical Staff at Anthropic, Former AI safety lead at BlueDot)
-*   Juan Felipe Ceron Uribe (AI Alignment Research Engineer at OpenAI)
-*   Nikita Ostrovsky (AI Reporter at TIME)
-*   Ana Carvalho (Contributor to AI Safety Engineering Taskforce)
-*   Sabrina Shih (AI Policy Manager at Responsible AI Institute)
-*   Cameron Holmes (Senior Research Manager at MATS)
-
-# Conference Workshop
-
-## 1st New England Mechanistic Interpretability (NEMI) Workshop
-[https://nemiconf.github.io/summer24/](https://nemiconf.github.io/summer24/)
-
-The NEMI (New England Mechanistic Interpretability) workshop series is a one-day event for academic and industry researchers in New England focusing on mechanistic interpretability. The 2024 workshop will be held on August 19th at Northeastern University in Boston, MA. It invites submissions for talks and posters on all aspects of interpretability, particularly encouraging rising researchers from New England graduate programs. Submissions can be work in progress or already published, with extended abstracts not exceeding 500 words. Key deadlines include August 2nd for registration and August 9th for abstract submission.
-
-**Instructors/Organizers:**
-*   **Senior Organizing Committee:**
-    *   David Bau, Northeastern University
-    *   Max Tegmark, MIT
-*   **Student Organizing Committee:**
-    *   Koyena Pal, Northeastern University
-    *   Kenneth Li, Harvard
-    *   Eric Michaud, MIT
-    *   Jannik Brinkmann, University of Mannheim
-
-## 2nd New England Mechanistic Interpretability (NEMI) Workshop
-[https://nemiconf.github.io/summer25/](https://nemiconf.github.io/summer25/)
-
-The 2nd New England Mechanistic Interpretability (NEMI) Workshop, held on August 22, 2025, at Northeastern University, Boston, aims to unite academic and industry researchers in New England to advance mechanistic interpretability in machine learning. The workshop will feature keynote speakers, oral presentations, interactive poster sessions, and discussions on topics like neural circuit interpretability, activation patching, and model simplification. Registration closes on August 4, 2025, with submissions due by August 9, 2025.
-
-**Keynote Speakers:**
-*   Lee Sharkey (Goodfire)
-*   Tamar Rott Shaham (MIT)
-*   Aaron Mueller (Boston University)
-*   Ekdeep Singh Lubana (Harvard University)
-
-**Student Organizers:**
-*   Koyena Pal (Northeastern University)
-*   Alex Loftus (Northeastern University)
-*   Emma Bortz (Northeastern University)
-*   Aruna Sankaranarayanan (MIT)
-
-**Senior Program Committee:**
-*   David Bau (Northeastern University)
-*   Jacob Andreas (MIT)
-*   Himabindu Lakkaraju (Harvard University)
-*   Najoung Kim (Boston University)
-
-**Logistics Support:**
-*   Heather Sciacca (Northeastern University)
-
-## ICML 2024
-[https://icml2024mi.pages.dev/](https://icml2024mi.pages.dev/)
-
-The ICML 2024 Mechanistic Interpretability Workshop, held on July 27th in Vienna, focuses on understanding the internal workings of neural networks by reverse engineering their algorithms into human-understandable mechanisms. The workshop aims to unite researchers from industry and academia to discuss progress, challenges, and future goals in this rapidly evolving field. It features talks, oral presentations, poster sessions, and a panel discussion, alongside a hands-on tutorial using the TransformerLens package. The event also awarded prizes for top papers in mechanistic interpretability research.
-
-**Instructors/Speakers/Panelists include:**
-*   David Bau (Northeastern University)
-*   Asma Ghandeharioun (Google DeepMind)
-*   Chris Olah (Anthropic)
-*   Naomi Saphra (Harvard University)
-*   Atticus Geiger (Pr(Ai)2R Group)
-*   Stella Biderman (EleutherAI)
-*   Arthur Conmy (Google DeepMind)
-*   Fazl Barez (University of Oxford)
-*   Mor Geva (Tel Aviv University, Google Research)
-*   Lawrence Chan (UC Berkeley)
-*   Kayo Yin (UC Berkeley)
-*   Neel Nanda (Google DeepMind)
-*   Max Tegmark (MIT)
-
-## ICML 2025 Workshop on Mechanistic Interpretability
-[https://icml.cc/virtual/2024/workshop/29953](https://icml.cc/virtual/2024/workshop/29953)
-
-The ICML 2025 Workshop on Mechanistic Interpretability is a one-day event focused on reverse-engineering trained neural networks to understand their learned algorithms and internal structure. The workshop includes talks, oral presentations, spotlight sessions, poster sessions, and a panel discussion. Key speakers include David Bau, Asma Ghandeharioun, and Chris Olah. The workshop aims to delve into various topics related to understanding the internal workings of AI models.
-
-**Organizers/Instructors:**
-*   Fazl Barez
-*   Lawrence Chan
-*   Mor Geva
-*   Kayo Yin
-*   Neel Nanda
-*   Max Tegmark
-
-## Mechanistic Interpretability Workshop (NeurIPS)
-[https://mechinterpworkshop.com/](https://mechinterpworkshop.com/)
-[https://mechinterpworkshop.com/schedule/](https://mechinterpworkshop.com/schedule/)
-
-The Mechanistic Interpretability Workshop at NeurIPS 2025, scheduled for Sunday, December 7, 2025, at the San Diego Convention Centre, focuses on understanding the internal mechanisms of neural networks. The workshop aims to address the challenge of interpreting model decisions, which is crucial for predicting behavior, ensuring reliability, and detecting adversarial actions. It will bring together researchers from academia, industry, and independent research to discuss advancements, build common understanding, and define future directions in mechanistic interpretability. The full-day program includes opening remarks, dedicated sessions for spotlight talks and poster presentations, and invited lightning talks. Topics of discussion include scalable end-to-end interpretability, the foundations of computation, pragmatic visions for interpretability, infrastructure for interpretability research, interpreting models with clever prompting, and funding opportunities in the field. The event will feature keynote speakers and poster sessions, building on the success of the ICML 2024 workshop.
-
-**Keynote Speakers:**
-*   Chris Olah (Interpretability Lead and Co-founder, Anthropic)
-*   Been Kim (Senior Staff Research Scientist, Google DeepMind)
-*   Sarah Schwettmann (Co-founder, Transluce)
-
-**Other Speakers/Organizing Committee:**
-*   Neel Nanda (Senior Research Scientist, Google DeepMind)
-*   Andrew Lee (Post-doc, Harvard)
-*   Andy Arditi (PhD Student, Northeastern University)
-*   Jemima Jones (Operations Lead)
-*   Stefan Heimersheim (Member of Technical Staff, FAR.AI)
-*   Anna Soligo (PhD Student, Imperial)
-*   Martin Wattenberg (Professor, Harvard University & Principal Research Scientist, Google DeepMind)
-*   Atticus Geiger (Lead, Pr(Ai)²R Group)
-*   Julius Adebayo (Founder and Researcher, Guide Labs)
-*   Kayo Yin (3rd year PhD student, UC Berkeley)
-*   Fazl Barez (Senior Research Fellow, Oxford Martin AI Governance Initiative)
-*   Lawrence Chan (Researcher, METR)
-*   Matthew Wearden (London Director, MATS)
-*   Ekdeep Singh Lubana (Goodfire)
-*   Adam Belfki (NDIF / Northeastern University)
-*   Rowan Wang (Anthropic)
-*   Josh Engels (Google DeepMind)
-*   Sheridan Feucht (Northeastern University)
-*   Uzay Macar (Anthropic Fellows)
-*   Leo Gao (OpenAI)
-*   Satvik Golechha & Sid Black (UK AISI)
-*   Bartosz Cywinski (MATS)
-*   David Bau (Northeastern University)
-*   Jake Mendel (Coefficient Giving)

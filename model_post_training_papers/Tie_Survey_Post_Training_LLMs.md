@@ -1,3 +1,5 @@
+# A Survey on Post-training of Large Language Models
+
 *Authors:** Guiyao Tie, Zeli Zhao, Dingjie Song, Fuyang Wei, Rong Zhou, Yurou Dai, Wen Yin, Zhejian Yang, Jiangyue Yan, Yao Su, Zhenhan Dai, Yifeng Xie, Yihan Cao, Lichao Sun, Pan Zhou, Lifang He, Hechang Chen, Yu Zhang, Qingsong Wen, Tianming Liu, Neil Zhenqiang Gong, Jiliang Tang, Caiming Xiong, Heng Ji, Philip S. Yu, Jianfeng Gao
 **Year/Venue:** March 2025, arXiv (2503.06072v3)
 **Link:** https://arxiv.org/abs/2503.06072

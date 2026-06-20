@@ -1,8 +1,8 @@
 # microgpt
 
-A minimal GPT implementation in pure Python with zero dependencies. Trains a transformer language model, generates text, and demonstrates LoRA supervised fine-tuning — all using only the standard library.
+A minimal GPT implementation in pure Python with zero dependencies. Trains a transformer language model, generates text, and demonstrates LoRA supervised fine-tuning and DPO alignment — all using only the standard library.
 
-Originally by [@karpathy](https://github.com/karpathy). SFT extension added for teaching post-training concepts.
+Originally by [@karpathy](https://github.com/karpathy). SFT and DPO extensions added for teaching post-training concepts.
 
 ## Usage
 
@@ -20,6 +20,13 @@ python3 microgpt_sft.py
 # SFT inference only
 python3 microgpt_sft.py -i
 python3 microgpt_sft.py -i model_sft.json
+
+# DPO alignment (loads model_sft.json, trains on preferences, saves model_dpo.json)
+python3 microgpt_dpo.py
+
+# DPO inference only
+python3 microgpt_dpo.py -i
+python3 microgpt_dpo.py -i model_dpo.json
 ```
 
 ## Files
@@ -28,10 +35,13 @@ python3 microgpt_sft.py -i model_sft.json
 |------|---------|
 | `microgpt.py` | Pretraining + inference |
 | `microgpt_sft.py` | LoRA supervised fine-tuning + inference |
+| `microgpt_dpo.py` | DPO preference alignment + inference |
 | `input.txt` | Pretraining corpus (names, auto-downloaded) |
 | `input_sft.txt` | SFT instruction-response pairs |
+| `input_dpo.txt` | DPO preference triples |
 | `model.json` | Saved pretrained weights |
 | `model_sft.json` | Saved SFT-merged weights |
+| `model_dpo.json` | Saved DPO-merged weights |
 
 ## Architecture
 
@@ -40,7 +50,7 @@ python3 microgpt_sft.py -i model_sft.json
 | Layers | 1 |
 | Embedding dim | 16 |
 | Attention heads | 4 |
-| Context length | 16 (pretrain) / 32 (SFT) |
+| Context length | 16 (pretrain) / 32 (SFT/DPO) |
 | MLP hidden dim | 64 |
 
 Notable differences from GPT-2: RMSNorm instead of LayerNorm, no biases, ReLU instead of GeLU.
@@ -63,6 +73,14 @@ Notable differences from GPT-2: RMSNorm instead of LayerNorm, no biases, ReLU in
 4. Loss computed only on response tokens (instruction is masked)
 5. Merges LoRA into base weights and saves `model_sft.json`
 
+### DPO (`microgpt_dpo.py`)
+
+1. Loads SFT model `model_sft.json` as both reference policy (frozen) and policy init
+2. Attaches LoRA adapters to the policy model
+3. For each (prompt, chosen, rejected) triple, computes log-probs under both policy and reference
+4. Optimizes the DPO loss: `-log σ(β · (log π_θ(y_w|x)/π_ref(y_w|x) - log π_θ(y_l|x)/π_ref(y_l|x)))`
+5. Merges LoRA into base weights and saves `model_dpo.json`
+
 ### LoRA Details
 
 | Parameter | Value |
@@ -75,12 +93,27 @@ Notable differences from GPT-2: RMSNorm instead of LayerNorm, no biases, ReLU in
 
 The adapter computes: `h = W_base @ x + (α/r) * W_up @ W_down @ x`
 
-### SFT Data Format (`input_sft.txt`)
+### DPO Details
 
-Pipe-delimited instruction-response pairs:
+| Parameter | Value |
+|-----------|-------|
+| β (KL penalty) | 0.3 |
+| Reference model | Frozen SFT checkpoint |
+| Learning rate | 0.005 |
+| Epochs | 30 |
+
+### Data Formats
+
+**SFT** (`input_sft.txt`) — pipe-delimited instruction-response pairs:
 ```
 fa|Alice
 mb|Benjamin
+```
+
+**DPO** (`input_dpo.txt`) — pipe-delimited preference triples:
+```
+fa|Alice|Bob
+mb|Benjamin|Alice
 ```
 
 ## Requirements

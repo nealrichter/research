@@ -8,11 +8,15 @@ Pure Python, zero dependencies.
 Based on Rafailov et al. "Direct Preference Optimization" (NeurIPS 2023).
 """
 
-import json, math, random, sys, os
+import json, math, random, sys, os, signal
 random.seed(42)
 
 # -i flag: inference-only mode
 inference_only = '-i' in sys.argv
+# -n flag: max training steps
+max_steps = None
+if '-n' in sys.argv:
+    max_steps = int(sys.argv[sys.argv.index('-n') + 1])
 if inference_only:
     random.seed()
     _idx = sys.argv.index('-i')
@@ -306,11 +310,24 @@ else:
     v_buf = [0.0] * len(lora_params)
     num_epochs = 30
     total_steps = num_epochs * len(dpo_data)
+    if max_steps:
+        total_steps = min(total_steps, max_steps)
     step = 0
+    stopped = [False]
+
+    def handle_sigint(sig, frame):
+        stopped[0] = True
+        print("\n  interrupted, saving model...")
+    signal.signal(signal.SIGINT, handle_sigint)
 
     for epoch in range(num_epochs):
+        if stopped[0]:
+            break
         random.shuffle(dpo_data)
         for prompt_str, chosen_str, rejected_str in dpo_data:
+            if stopped[0] or step >= total_steps:
+                stopped[0] = True
+                break
             prompt_tok = [BOS] + encode(prompt_str) + [SEP]
             chosen_tok = encode(chosen_str) + [BOS]
             rejected_tok = encode(rejected_str) + [BOS]

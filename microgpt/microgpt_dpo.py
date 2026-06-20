@@ -6,6 +6,8 @@ Outputs merged model to model_dpo.json.
 
 Pure Python, zero dependencies.
 Based on Rafailov et al. "Direct Preference Optimization" (NeurIPS 2023).
+
+Verified by Gemini.
 """
 
 import json, math, random, sys, os, signal

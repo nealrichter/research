@@ -13,8 +13,24 @@ Verified by Gemini.
 import json, math, random, sys, os, signal
 random.seed(42)
 
+# -h/--help: print usage and exit before doing any work
+if '-h' in sys.argv or '--help' in sys.argv:
+    print(
+        "usage: python3 microgpt_dpo.py [-i [MODEL.json]] [--viz [N]] [-n STEPS] [-h]\n\n"
+        "DPO-align the SFT model on preference pairs, then generate samples.\n\n"
+        "  -i [MODEL.json]  inference only from saved weights (default model_dpo.json)\n"
+        "  --viz [N]        loss sparkline + attention heat map; N>0 dumps every N steps\n"
+        "  -n STEPS         cap training to STEPS steps\n"
+        "  -h, --help       show this help and exit"
+    )
+    sys.exit(0)
+
 # -i flag: inference-only mode
 inference_only = '-i' in sys.argv
+# --viz [N]: ASCII visualization (loss sparkline + attention heat map); all logic in microgpt_viz.py
+import microgpt_viz as viz
+viz.configure(sys.argv)
+viz.tee_stdout()  # mirror all stdout into an appended train.log
 # -n flag: max training steps
 max_steps = None
 if '-n' in sys.argv:
@@ -22,7 +38,8 @@ if '-n' in sys.argv:
 if inference_only:
     random.seed()
     _idx = sys.argv.index('-i')
-    model_file = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else 'model_dpo.json'
+    _nxt = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else ''
+    model_file = _nxt if _nxt and not _nxt.startswith('-') else 'model_dpo.json'  # ignore following flags
     if not os.path.exists(model_file):
         print(f"error: {model_file} not found. Run `python3 microgpt_dpo.py` first.")
         sys.exit(1)
@@ -154,6 +171,7 @@ def gpt_policy(token_id, pos_id, keys, values):
             attn_logits = [sum(q_h[j] * k_h[t][j] for j in range(head_dim)) / head_dim**0.5
                           for t in range(len(k_h))]
             attn_weights = softmax(attn_logits)
+            if viz.enabled: viz.attn(pos_id, h, attn_weights)  # cache head-0 attention (policy only)
             x_attn.extend([sum(attn_weights[t] * v_h[t][j] for t in range(len(v_h)))
                           for j in range(head_dim)])
         x = [a + b for a, b in zip(linear(x_attn, state_dict[f'layer{li}.attn_wo']), x_res)]
@@ -316,6 +334,7 @@ else:
         total_steps = min(total_steps, max_steps)
     step = 0
     stopped = [False]
+    first_loss = last_loss = None  # end-to-end loss trajectory
 
     def handle_sigint(sig, frame):
         stopped[0] = True
@@ -360,10 +379,18 @@ else:
             for p in base_params:
                 p.grad = 0
 
+            if first_loss is None: first_loss = loss.data
+            last_loss = loss.data
             step += 1
-            print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f}", end='\r')
+            if viz.enabled:
+                viz.step(step - 1, total_steps, loss.data)
+            else:
+                print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f}", end='\r')
 
     # --- After DPO ---
+    if first_loss is not None:
+        _pct = (last_loss - first_loss) / first_loss * 100 if first_loss else 0.0
+        print(f"\nLoss (DPO preference) {first_loss:.4f} -> {last_loss:.4f}  ({_pct:+.1f}%)")
     run_inference("\nAFTER DPO")
 
     # --- Merge LoRA into base and save ---
@@ -381,3 +408,7 @@ else:
                    'config': {'n_layer': n_layer, 'n_embd': n_embd, 'block_size': block_size, 'n_head': n_head},
                    'weights': {k: [[p.data for p in row] for row in mat] for k, mat in state_dict.items()}}, f)
     print(f"\nsaved model_dpo.json (run: python3 microgpt_dpo.py -i)")
+
+# end-of-run visualization (tall loss sparkline + attention matrix); no-op without --viz
+if viz.enabled:
+    viz.finish()

@@ -27,6 +27,11 @@ python3 microgpt_dpo.py
 # DPO inference only
 python3 microgpt_dpo.py -i
 python3 microgpt_dpo.py -i model_dpo.json
+
+# Visualize training (ASCII loss sparkline + attention + embedding heat maps)
+python3 microgpt.py --viz        # clean live line; loss chart + heat maps at the end
+python3 microgpt.py --viz 100    # multi-row loss sparkline + attention matrix every 100 steps
+python3 microgpt.py -h           # usage
 ```
 
 ## Files
@@ -36,12 +41,14 @@ python3 microgpt_dpo.py -i model_dpo.json
 | `microgpt.py` | Pretraining + inference |
 | `microgpt_sft.py` | LoRA supervised fine-tuning + inference |
 | `microgpt_dpo.py` | DPO preference alignment + inference |
+| `microgpt_viz.py` | ASCII visualization helpers (loss sparkline + attention heat map) |
 | `input.txt` | Pretraining corpus (names, auto-downloaded) |
 | `input_sft.txt` | SFT instruction-response pairs |
 | `input_dpo.txt` | DPO preference triples |
 | `model.json` | Saved pretrained weights |
 | `model_sft.json` | Saved SFT-merged weights |
 | `model_dpo.json` | Saved DPO-merged weights |
+| `train.log` | Appended run log — mirrors stdout (transient per-step progress excluded) |
 
 ## Architecture
 
@@ -54,6 +61,34 @@ python3 microgpt_dpo.py -i model_dpo.json
 | MLP hidden dim | 64 |
 
 Notable differences from GPT-2: RMSNorm instead of LayerNorm, no biases, ReLU instead of GeLU.
+
+## Visualization
+
+`microgpt.py` has an optional `--viz [N]` flag, backed by the dependency-free
+`microgpt_viz.py` module. All visualization state and logic live in the module; the
+core script just calls a few hooks (each guarded so an absent `--viz` runs none of it).
+
+- By default (no flag) training prints a one-line end-to-end summary: `Loss X -> Y (-21.3%)`.
+- `--viz` (or `--viz 0`) keeps the live progress line clean (`loss V (D)`) and, at the end,
+  dumps a multi-row loss chart, an attention heat map, and a token-embedding similarity map.
+- `--viz N` (N > 0) prints a multi-row loss sparkline + attention matrix snapshot every N steps.
+
+The per-step progress line is augmented to `loss V (D)`, where `D` is the change since the
+last snapshot. Multi-row charts are only shown where vertical space is free (periodic
+snapshots and end-of-run), never crammed onto the live carriage-return line. Loss is
+EMA-smoothed and bucket-mean downsampled for display only (the reported numbers are never
+altered), and normalized over the whole run so snapshots stay comparable.
+
+The **token-embedding similarity** map (shown by `microgpt.py` at the end) is the classic
+"did the embeddings learn meaning?" view: a char-vs-char cosine-similarity grid, z-scored
+to ±2σ so structure (e.g. vowels clustering) stands out instead of washing out.
+
+The sparkline renderer is a single flexible function — `sparkline(history, height=N)` —
+where `height` sets how many character-rows tall the chart is (1 = inline line, 3 = chart).
+
+| Glyph | Loss bucket (sparkline) |   | Glyph | Attention weight (heat map) |
+|-------|-------------------------|---|-------|-----------------------------|
+| ` ` … `█` | low … high (8 levels per row) |   | `█` `▓` `░` | high → low; `□` = masked (causal future, not computed) |
 
 ## How It Works
 

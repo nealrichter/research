@@ -18,14 +18,33 @@ import random   # random.seed, random.choices, random.gauss, random.shuffle
 import json     # json.dump/load for model save/load
 random.seed(42) # Let there be order among chaos
 
+# -h/--help: print usage and exit before doing any work
+if '-h' in sys.argv or '--help' in sys.argv:
+    print(
+        "usage: python3 microgpt.py [-i [MODEL.json]] [--viz [N]] [-h]\n\n"
+        "Train a tiny char-level GPT on names, then generate samples.\n\n"
+        "  -i [MODEL.json]  inference only from saved weights (default model.json)\n"
+        "  --viz [N]        loss sparkline + attention heat map; N>0 dumps every N steps\n"
+        "  -h, --help       show this help and exit"
+    )
+    sys.exit(0)
+
 # -i flag: inference-only mode, loads model file and skips training
 inference_only = '-i' in sys.argv
+
+# --viz [N]: ASCII visualization. Absent=off; 0=in-situ loss sparkline + end matrix dump;
+# N>0=sparkline + attention matrix dump every N steps. All state/logic lives in microgpt_viz.py;
+# every hook below is guarded by `viz.enabled`, so an absent --viz runs none of the new logic.
+import microgpt_viz as viz
+viz.configure(sys.argv)
+viz.tee_stdout()  # mirror all stdout into an appended train.log
 
 if inference_only:
     random.seed()  # non-deterministic sampling for inference-only mode
     # Use file argument after -i, default to model.json
     _idx = sys.argv.index('-i')
-    model_file = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else 'model.json'
+    _nxt = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else ''
+    model_file = _nxt if _nxt and not _nxt.startswith('-') else 'model.json'  # ignore following flags
     if not os.path.exists(model_file):
         print(f"error: {model_file} not found. Run `python3 microgpt.py` first to train.")
         sys.exit(1)
@@ -162,6 +181,7 @@ def gpt(token_id, pos_id, keys, values):
             v_h = [vi[hs:hs+head_dim] for vi in values[li]]
             attn_logits = [sum(q_h[j] * k_h[t][j] for j in range(head_dim)) / head_dim**0.5 for t in range(len(k_h))]
             attn_weights = softmax(attn_logits)
+            if viz.enabled: viz.attn(pos_id, h, attn_weights)  # cache head-0 attention for viz
             head_out = [sum(attn_weights[t] * v_h[t][j] for t in range(len(v_h))) for j in range(head_dim)]
             x_attn.extend(head_out)
         x = linear(x_attn, state_dict[f'layer{li}.attn_wo'])
@@ -217,7 +237,12 @@ if not inference_only:
             p.data -= lr_t * m_hat / (v_hat ** 0.5 + eps_adam)
             p.grad = 0
 
-        print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
+        if step == 0: first_loss = loss.data  # remember start of trajectory
+        last_loss = loss.data                 # ...and the latest, for the end-to-end summary
+        if viz.enabled:
+            viz.step(step, num_steps, loss.data)
+        else:
+            print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
 
     # Save trained model weights to a JSON file
     with open('model.json', 'w') as f:
@@ -227,6 +252,8 @@ if not inference_only:
                    'weights': {k: [[p.data for p in row] for row in mat]
                                for k, mat in state_dict.items()}}, f)
     print(f"\nsaved model to model.json")
+    _pct = (last_loss - first_loss) / first_loss * 100 if first_loss else 0.0
+    print(f"Loss (CE / all tokens) {first_loss:.4f} -> {last_loss:.4f}  ({_pct:+.1f}%)")  # end-to-end loss trajectory
 
 # Inference: may the model babble back to us
 temperature = 0.5 # in (0, 1], control the "creativity" of generated text, low to high
@@ -243,4 +270,8 @@ for sample_idx in range(20):
             break
         sample.append(uchars[token_id])
     print(f"sample {sample_idx+1:2d}: {''.join(sample)}")
+
+if viz.enabled:
+    viz.finish()                                         # loss sparkline + attention matrix dump
+    viz.embedding_similarity(state_dict['wte'], uchars)  # what did the model learn about characters?
 

@@ -11,12 +11,28 @@ Based on Hu et al. "LoRA" (2021), Dettmers et al. "QLoRA" (2024).
 import json, math, random, sys, os
 random.seed(42)
 
+# -h/--help: print usage and exit before doing any work
+if '-h' in sys.argv or '--help' in sys.argv:
+    print(
+        "usage: python3 microgpt_sft.py [-i [MODEL.json]] [--viz [N]] [-h]\n\n"
+        "LoRA-finetune the pretrained model on instruction->response pairs, then sample.\n\n"
+        "  -i [MODEL.json]  inference only from saved weights (default model_sft.json)\n"
+        "  --viz [N]        loss sparkline + attention heat map; N>0 dumps every N steps\n"
+        "  -h, --help       show this help and exit"
+    )
+    sys.exit(0)
+
 # -i flag: inference-only mode using a saved SFT model file
 inference_only = '-i' in sys.argv
+# --viz [N]: ASCII visualization (loss sparkline + attention heat map); all logic in microgpt_viz.py
+import microgpt_viz as viz
+viz.configure(sys.argv)
+viz.tee_stdout()  # mirror all stdout into an appended train.log
 if inference_only:
     random.seed()
     _idx = sys.argv.index('-i')
-    model_file = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else 'model_sft.json'
+    _nxt = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else ''
+    model_file = _nxt if _nxt and not _nxt.startswith('-') else 'model_sft.json'  # ignore following flags
     if not os.path.exists(model_file):
         print(f"error: {model_file} not found. Run `python3 microgpt_sft.py` first to train.")
         sys.exit(1)
@@ -145,6 +161,7 @@ def gpt(token_id, pos_id, keys, values):
             attn_logits = [sum(q_h[j] * k_h[t][j] for j in range(head_dim)) / head_dim**0.5
                           for t in range(len(k_h))]
             attn_weights = softmax(attn_logits)
+            if viz.enabled: viz.attn(pos_id, h, attn_weights)  # cache head-0 attention for viz
             x_attn.extend([sum(attn_weights[t] * v_h[t][j] for t in range(len(v_h)))
                           for j in range(head_dim)])
         x = [a + b for a, b in zip(linear(x_attn, state_dict[f'layer{li}.attn_wo']), x_res)]
@@ -198,6 +215,7 @@ else:
     num_epochs = 50
     total_steps = num_epochs * len(sft_data)
     step = 0
+    first_loss = last_loss = None  # end-to-end loss trajectory
 
     for epoch in range(num_epochs):
         random.shuffle(sft_data)
@@ -231,10 +249,18 @@ else:
             for p in base_params:
                 p.grad = 0
 
+            if first_loss is None: first_loss = loss.data
+            last_loss = loss.data
             step += 1
-            print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f}", end='\r')
+            if viz.enabled:
+                viz.step(step - 1, total_steps, loss.data)
+            else:
+                print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f}", end='\r')
 
     # --- After SFT ---
+    if first_loss is not None:
+        _pct = (last_loss - first_loss) / first_loss * 100 if first_loss else 0.0
+        print(f"\nLoss (CE / response tokens) {first_loss:.4f} -> {last_loss:.4f}  ({_pct:+.1f}%)")
     run_inference("\nAFTER SFT (base + LoRA)")
 
     # --- Merge LoRA into base and save ---
@@ -252,3 +278,7 @@ else:
                    'config': {'n_layer': n_layer, 'n_embd': n_embd, 'block_size': block_size, 'n_head': n_head},
                    'weights': {k: [[p.data for p in row] for row in mat] for k, mat in state_dict.items()}}, f)
     print(f"\nsaved model_sft.json (run: python3 microgpt_sft.py -i)")
+
+# end-of-run visualization (tall loss sparkline + attention matrix); no-op without --viz
+if viz.enabled:
+    viz.finish()

@@ -1,6 +1,6 @@
 # A Survey on Post-training of Large Language Models
 
-*Authors:** Guiyao Tie, Zeli Zhao, Dingjie Song, Fuyang Wei, Rong Zhou, Yurou Dai, Wen Yin, Zhejian Yang, Jiangyue Yan, Yao Su, Zhenhan Dai, Yifeng Xie, Yihan Cao, Lichao Sun, Pan Zhou, Lifang He, Hechang Chen, Yu Zhang, Qingsong Wen, Tianming Liu, Neil Zhenqiang Gong, Jiliang Tang, Caiming Xiong, Heng Ji, Philip S. Yu, Jianfeng Gao
+**Authors:** Guiyao Tie, Zeli Zhao, Dingjie Song, Fuyang Wei, Rong Zhou, Yurou Dai, Wen Yin, Zhejian Yang, Jiangyue Yan, Yao Su, Zhenhan Dai, Yifeng Xie, Yihan Cao, Lichao Sun, Pan Zhou, Lifang He, Hechang Chen, Yu Zhang, Qingsong Wen, Tianming Liu, Neil Zhenqiang Gong, Jiliang Tang, Caiming Xiong, Heng Ji, Philip S. Yu, Jianfeng Gao
 **Year/Venue:** March 2025, arXiv (2503.06072v3)
 **Link:** https://arxiv.org/abs/2503.06072
 
@@ -146,7 +146,7 @@ The paper makes clear why the ordering is SFT → Alignment → Reasoning:
 
 1. **SFT must come first** (in the standard pipeline) because alignment methods (RLHF/DPO) need the model to already produce coherent, instruction-following outputs. You can't express preferences over gibberish. The reference policy π_ref in DPO's formulation is typically the SFT checkpoint.
 
-2. **Alignment before reasoning** because unconstrained RL for reasoning could exploit reward hacking or produce unsafe reasoning chains. The alignment stage establishes behavioral guardrails that reasoning RL then operates within.
+2. **Alignment and reasoning interleave in practice.** The canonical ordering suggests alignment before reasoning RL, but DeepSeek-R1's actual pipeline does reasoning RL *first*, then a *second* alignment pass afterward (SFT cold start → reasoning RL → rejection sampling → final RL alignment). The concern with unconstrained reasoning RL is reward hacking and unsafe chains, which is why DeepSeek-R1-Zero exhibited degenerate behaviors. The practical pattern is: minimal alignment → reasoning RL → final alignment cleanup.
 
 3. **The DeepSeek-R1-Zero exception** is remarkable precisely because it violates this ordering — showing that with a sufficiently well-designed reward (rule-based accuracy + format rewards) and enough compute, reasoning can emerge directly from RL on a base model without SFT or alignment as prerequisites. However, the resulting model had readability issues (language mixing, repetition), which is why the full DeepSeek-R1 pipeline still uses SFT as a cold start.
 
@@ -457,7 +457,7 @@ DeepSeek's PPO variant that eliminates the critic/value network. For each prompt
 }
 ```
 
-**Key difference from PPO:** No value network V(s) needed. Advantage = (reward_i - mean(group_rewards)) / std(group_rewards).
+**Key difference from PPO:** No value network V(s) needed. Advantage = (reward_i - mean(group_rewards)) / std(group_rewards). Note: GRPO still uses the clipped surrogate objective (like PPO) and a KL penalty against a reference policy — it only eliminates the *critic*, not the rest of the PPO machinery.
 
 ---
 
@@ -488,7 +488,7 @@ LoRA applied on top of a 4-bit quantized base model. Base weights stored in NF4 
 **Same data as LoRA.** The difference is purely in memory:
 ```
 Full fine-tuning 70B: ~280 GB VRAM (impossible on single GPU)
-LoRA 70B:             ~160 GB VRAM (still needs multi-GPU)
+LoRA 70B:             ~160 GB VRAM (needs 2× A100 80GB for base weights in fp16 + adapter optimizer states)
 QLoRA 70B:            ~48 GB VRAM  (fits on 1× A100 80GB)
 ```
 

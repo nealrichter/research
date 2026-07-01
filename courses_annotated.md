@@ -162,3 +162,12 @@ The DeepLearning.AI course "Post-training of LLMs" focuses on fine-tuning pre-tr
 *   Oleksii Kuchaiev (Nvidia)
 *   Jiantao Jiao (UC Berkeley)
 *   Esmaeil Gargari (DeepLearning.AI)
+
+## rlhfbook.com
+
+### Reinforcement Learning from Human Feedback (Course)
+[https://rlhfbook.com/course](https://rlhfbook.com/course)
+
+A full course accompanying the RLHF book by Nathan Lambert, covering the foundations and practice of reinforcement learning from human feedback and LLM post-training. The course follows the book chapter by chapter with video lectures, slides, PDFs, and source material. Topics include: ML foundations of post-training (KL divergence, cross-entropy), instruction fine-tuning, reward models, rejection sampling, RL motivation and math (policy gradients), RL implementation and engineering, reasoning models (RLVR, inference-time scaling), DPO and variants, synthetic data, AI feedback, and preference data. Also includes Q&A sessions, a guest conversation on frontier post-training recipes, and supplementary talks on GRPO variants, the DPO-vs-PPO debate, and the reinforcement learning renaissance in language models. Aimed at early AI PhD/master's students but accessible to motivated learners with basic ML background.
+
+**Instructor:** Nathan Lambert (AI2/Allen Institute for AI)

@@ -1,0 +1,96 @@
+{"prompt": "AE, Abu Dhabi", "target": "AUH", "responses": ["AAH", "AUH", "ARX", "AUH", "DFW", "AUH", "AUH", "AOS"]}
+{"prompt": "AE, Dubai", "target": "DXB", "responses": ["DKL", "DXB", "SI", "DXB", "CJJ", "DXB", "DXB", "DXB"]}
+{"prompt": "AR, Buenos Aires", "target": "EZE", "responses": ["GVA", "CHQ", "PSB", "EZE", "EZE", "EZE", "EZE", "EZE"]}
+{"prompt": "AT, Vienna", "target": "VIE", "responses": ["VIE", "VJJ", "VIE", "VIE", "BQNG", "ARN", "RFIT", "VIE"]}
+{"prompt": "AU, Brisbane", "target": "BNE", "responses": ["KBX", "BSF", "YYC", "DCA", "BNE", "BOT", "CAI", "GRU"]}
+{"prompt": "AU, Melbourne", "target": "MEL", "responses": ["NC", "MEL", "MEL", "MUK", "MEL", "GIG", "ATH", "RC"]}
+{"prompt": "AU, Sydney", "target": "SYD", "responses": ["TIH", "SYD", "SYD", "SSZ", "XWHQ", "SDT", "BOG", "IAYW"]}
+{"prompt": "BR, Rio de Janeiro", "target": "GIG", "responses": ["GGO", "GIG", "GVZ", "DUB", "GIG", "ATH", "GIG", "JED"]}
+{"prompt": "BR, Sao Paulo", "target": "GRU", "responses": ["HKG", "RSKR", "BCN", "FCO", "GRU", "GRU", "GFF", "GRU"]}
+{"prompt": "CA, Calgary", "target": "YYC", "responses": ["YFX", "NH", "MAD", "YYC", "OGMK", "YYC", "YJK", "RZ"]}
+{"prompt": "CA, Montreal", "target": "YUL", "responses": ["YUL", "SLC", "GE", "EDI", "YUL", "SEA", "ATH", "YUL"]}
+{"prompt": "CA, Ottawa", "target": "YOW", "responses": ["YOA", "YOW", "EM", "YOW", "ZRH", "YOW", "YOW", "CPH"]}
+{"prompt": "CA, Toronto", "target": "YYZ", "responses": ["YYZ", "YSU", "YME", "YYZ", "YYZ", "YBI", "YYZ", "BOG"]}
+{"prompt": "CA, Vancouver", "target": "YVR", "responses": ["YVR", "WB", "YVR", "DXG", "YQK", "YNY", "YVR", "YGK"]}
+{"prompt": "CH, Geneva", "target": "GVA", "responses": ["GHI", "AQ", "GCN", "DUB", "WJ", "GVA", "HZUN", "GOY"]}
+{"prompt": "CH, Zurich", "target": "ZRH", "responses": ["ZRH", "DCO", "ZRH", "ZSF", "ZGM", "CL", "ZRH", "ZRH"]}
+{"prompt": "CL, Santiago", "target": "SCL", "responses": ["ZELS", "SCY", "SDA", "ATH", "SCL", "SCL", "SCL", "XF"]}
+{"prompt": "CN, Beijing", "target": "PEK", "responses": ["PEK", "PEK", "ZTY", "PEK", "PEK", "WA", "PIY", "VGUC"]}
+{"prompt": "CN, Hong Kong", "target": "HKG", "responses": ["FVL", "HKG", "FR", "DTW", "JNR", "YCZ", "HKG", "API"]}
+{"prompt": "CN, Shanghai", "target": "PVG", "responses": ["PNK", "PGS", "PVG", "RYTF", "AUH", "IWSH", "PVG", "LAS"]}
+{"prompt": "CO, Bogota", "target": "BOG", "responses": ["BOE", "BJT", "BOG", "BKV", "BOG", "BOG", "RMLF", "BOM"]}
+{"prompt": "CZ, Prague", "target": "PRG", "responses": ["PRG", "PRG", "ESB", "PCY", "PRG", "PRG", "AG", "SEA"]}
+{"prompt": "DE, Berlin", "target": "BER", "responses": ["MUC", "BSJ", "YYZ", "BAT", "UF", "NBGW", "GIG", "BZP"]}
+{"prompt": "DE, Frankfurt", "target": "FRA", "responses": ["PSN", "LEWL", "HUMG", "CUN", "FRA", "FRA", "FRA", "FRA"]}
+{"prompt": "DE, Munich", "target": "MUC", "responses": ["MUC", "LIM", "MBK", "SCL", "MUC", "XPS", "JAJT", "NTU"]}
+{"prompt": "DK, Copenhagen", "target": "CPH", "responses": ["FLA", "CPH", "CKE", "DUB", "AKOA", "CDM", "CPH", "HKG"]}
+{"prompt": "EG, Cairo", "target": "CAI", "responses": ["SLC", "HYK", "AOZ", "CAI", "CUQ", "FA", "CAI", "CAI"]}
+{"prompt": "ES, Barcelona", "target": "BCN", "responses": ["BOF", "BTE", "BTC", "CAI", "BYK", "BBR", "BCU", "UUOB"]}
+{"prompt": "ES, Madrid", "target": "MAD", "responses": ["MEL", "PVG", "MAK", "CGK", "XLDE", "WAW", "MAD", "UMVP"]}
+{"prompt": "ET, Addis Ababa", "target": "ADD", "responses": ["ADD", "ADD", "WGM", "AJA", "MJ", "ADD", "ADD", "AWO"]}
+{"prompt": "FI, Helsinki", "target": "HEL", "responses": ["YUL", "HEL", "HMT", "HQM", "HK", "HEL", "HJO", "HEL"]}
+{"prompt": "FR, Nice", "target": "NCE", "responses": ["ISHG", "NCE", "NCE", "NCE", "KIX", "NCE", "NCE", "YVR"]}
+{"prompt": "FR, Paris", "target": "CDG", "responses": ["CTP", "HJ", "CDG", "CDB", "CDG", "CDG", "WMWO", "MNL"]}
+{"prompt": "GB, Edinburgh", "target": "EDI", "responses": ["EDI", "YMV", "SEA", "ERD", "CGO", "PHL", "UJ", "WZH"]}
+{"prompt": "GB, London", "target": "LHR", "responses": ["LPT", "QG", "LHR", "LHR", "LEK", "LMA", "LHR", "LHR"]}
+{"prompt": "GB, Manchester", "target": "MAN", "responses": ["RY", "PUFC", "MAN", "MAN", "MAN", "MAN", "MAN", "TOHD"]}
+{"prompt": "GR, Athens", "target": "ATH", "responses": ["ASY", "LHR", "PHL", "ATH", "RUH", "AAF", "AWP", "ATH"]}
+{"prompt": "ID, Jakarta", "target": "CGK", "responses": ["OTE", "MNL", "ZL", "MK", "CGK", "CGK", "CGK", "LHR"]}
+{"prompt": "IE, Dublin", "target": "DUB", "responses": ["DUB", "ACGD", "VAWM", "DUB", "AMS", "LBGD", "DUB", "DZP"]}
+{"prompt": "IL, Tel Aviv", "target": "TLV", "responses": ["TLV", "TLV", "TOC", "LD", "YHS", "PRG", "LD", "TLV"]}
+{"prompt": "IN, Delhi", "target": "DEL", "responses": ["DTD", "DEL", "IUG", "DEL", "DVP", "DWL", "DXB", "DOL"]}
+{"prompt": "IN, Mumbai", "target": "BOM", "responses": ["BOM", "BOM", "BOG", "IM", "KRV", "ZDZ", "BOM", "BOM"]}
+{"prompt": "IT, Milan", "target": "MXP", "responses": ["NL", "MKR", "MXP", "DCA", "MXP", "MQW", "JIST", "QG"]}
+{"prompt": "IT, Rome", "target": "FCO", "responses": ["FHF", "FCO", "SCEH", "FCO", "FCO", "FCO", "CGK", "FCO"]}
+{"prompt": "JP, Osaka", "target": "KIX", "responses": ["EZE", "KEE", "KJR", "CAI", "KIX", "AUS", "AUH", "KIX"]}
+{"prompt": "JP, Tokyo", "target": "NRT", "responses": ["REL", "NRT", "NQL", "NRT", "ZW", "NRT", "EWR", "NZH"]}
+{"prompt": "KE, Nairobi", "target": "NBO", "responses": ["KAWU", "TVXU", "NBO", "QQ", "NSR", "CQBU", "NBO", "DUB"]}
+{"prompt": "KR, Seoul", "target": "ICN", "responses": ["ICN", "ICN", "IED", "LAX", "ARN", "XYZ", "ICN", "MB"]}
+{"prompt": "MA, Casablanca", "target": "CMN", "responses": ["WS", "JUAN", "AKL", "CGJ", "CJR", "AMS", "IPQQ", "VIE"]}
+{"prompt": "MX, Cancun", "target": "CUN", "responses": ["CUN", "FRA", "CUN", "CUN", "CX", "CUN", "AUH", "YKTE"]}
+{"prompt": "MX, Mexico City", "target": "MEX", "responses": ["DOH", "KYAJ", "CDG", "ZJ", "JKED", "CFQ", "UG", "MEX"]}
+{"prompt": "MY, Kuala Lumpur", "target": "KUL", "responses": ["KBT", "KUL", "KUL", "UUP", "KUL", "OU", "KUL", "AU"]}
+{"prompt": "NG, Lagos", "target": "LOS", "responses": ["LOS", "LOS", "LOS", "LOS", "LNT", "LAX", "NRT", "GRU"]}
+{"prompt": "NL, Amsterdam", "target": "AMS", "responses": ["SX", "AHQ", "AMS", "LCS", "NBO", "AMS", "AMS", "AMS"]}
+{"prompt": "NO, Oslo", "target": "OSL", "responses": ["OPS", "PHL", "CPH", "CGK", "OSL", "OWQ", "WLXK", "KCL"]}
+{"prompt": "NZ, Auckland", "target": "AKL", "responses": ["AJD", "CC", "KUL", "AVO", "AOI", "AKL", "AUH", "WSZ"]}
+{"prompt": "PE, Lima", "target": "LIM", "responses": ["LJP", "LIM", "LFC", "CHF", "BNE", "PQAY", "AHT", "AWO"]}
+{"prompt": "PH, Manila", "target": "MNL", "responses": ["YYZ", "MZC", "PEK", "SLC", "MNL", "MNL", "MNL", "CBEQ"]}
+{"prompt": "PL, Warsaw", "target": "WAW", "responses": ["WHR", "MNL", "HKG", "IC", "WPN", "WAW", "WAW", "AH"]}
+{"prompt": "PT, Lisbon", "target": "LIS", "responses": ["LIS", "LIS", "LIS", "LIS", "LIS", "LEJ", "LNV", "KT"]}
+{"prompt": "QA, Doha", "target": "DOH", "responses": ["CPH", "OOS", "HEL", "RUH", "DOH", "VXC", "LK", "DOH"]}
+{"prompt": "SA, Jeddah", "target": "JED", "responses": ["IIEN", "JED", "YOW", "YYC", "CG", "JED", "JED", "EU"]}
+{"prompt": "SA, Riyadh", "target": "RUH", "responses": ["EZE", "RWQ", "WQD", "RUH", "ORD", "BNIL", "RUH", "QZ"]}
+{"prompt": "SE, Stockholm", "target": "ARN", "responses": ["ARN", "AJP", "XLVQ", "ARN", "LIM", "CXI", "ANE", "ARN"]}
+{"prompt": "SG, Singapore", "target": "SIN", "responses": ["MNL", "LOS", "SIN", "SFO", "SLC", "SBQ", "SIN", "SIN"]}
+{"prompt": "TH, Bangkok", "target": "BKK", "responses": ["BKG", "WIPD", "BKK", "RDSC", "BQI", "BKK", "BYZ", "QL"]}
+{"prompt": "TR, Ankara", "target": "ESB", "responses": ["LAX", "ESB", "YMF", "ESB", "ESB", "NO", "ENR", "DJEV"]}
+{"prompt": "TR, Istanbul", "target": "IST", "responses": ["SB", "YVR", "IST", "SFO", "GGZ", "JY", "UUN", "TLV"]}
+{"prompt": "US, Atlanta", "target": "ATL", "responses": ["DGQW", "ACV", "CEL", "CGK", "ATL", "XYK", "PDX", "ATL"]}
+{"prompt": "US, Austin", "target": "AUS", "responses": ["FIC", "AID", "AUS", "SDS", "SIN", "GV", "CPT", "ALU"]}
+{"prompt": "US, Boston", "target": "BOS", "responses": ["BOS", "BOS", "BOS", "BQB", "PAN", "BOS", "BOS", "LOS"]}
+{"prompt": "US, Chicago", "target": "ORD", "responses": ["TPA", "AUH", "ONJ", "NZOK", "ESB", "PDX", "ORD", "ORD"]}
+{"prompt": "US, Dallas", "target": "DFW", "responses": ["GRC", "DTD", "SLC", "VR", "QVB", "AFU", "YNZ", "AUS"]}
+{"prompt": "US, Denver", "target": "DEN", "responses": ["DEN", "DHW", "DEN", "DHU", "LAS", "DXK", "RJU", "DEN"]}
+{"prompt": "US, Detroit", "target": "DTW", "responses": ["DTW", "CGK", "DVO", "DTW", "DTW", "DHP", "KIX", "ATL"]}
+{"prompt": "US, Houston", "target": "IAH", "responses": ["IAH", "PLQ", "BQ", "KUL", "IYD", "IUA", "IAH", "JYA"]}
+{"prompt": "US, Las Vegas", "target": "LAS", "responses": ["LAS", "PDX", "SEA", "LNK", "LGC", "LMK", "LGG", "LOS"]}
+{"prompt": "US, Los Angeles", "target": "LAX", "responses": ["LAX", "FDB", "LAX", "LZV", "RSO", "LAX", "LAX", "LAX"]}
+{"prompt": "US, Miami", "target": "MIA", "responses": ["MSE", "GRU", "MIA", "MIA", "MIA", "JO", "ATH", "MIA"]}
+{"prompt": "US, Minneapolis", "target": "MSP", "responses": ["IZ", "MNT", "DI", "MSP", "BCN", "MSP", "QEZL", "VN"]}
+{"prompt": "US, Nashville", "target": "BNA", "responses": ["BNA", "BNA", "IY", "GQ", "BDH", "PVG", "BPP", "BNA"]}
+{"prompt": "US, New York", "target": "JFK", "responses": ["JXI", "VA", "JFK", "JOQ", "QAX", "YYC", "GUK", "KIX"]}
+{"prompt": "US, Newark", "target": "EWR", "responses": ["EWR", "PRG", "SLC", "EIS", "EWZ", "EWR", "BNE", "EWR"]}
+{"prompt": "US, Orlando", "target": "MCO", "responses": ["MCO", "MCO", "YYZ", "MCO", "MCO", "LOS", "TLV", "SEEZ"]}
+{"prompt": "US, Philadelphia", "target": "PHL", "responses": ["ICN", "OSL", "LGPB", "PHL", "PVR", "PHL", "PHL", "PHL"]}
+{"prompt": "US, Phoenix", "target": "PHX", "responses": ["PHX", "PHX", "LAS", "LAS", "PHX", "PJH", "ATL", "VQP"]}
+{"prompt": "US, Portland", "target": "PDX", "responses": ["PDX", "PDX", "SLC", "PJD", "PKB", "PDX", "PUN", "PDX"]}
+{"prompt": "US, Salt Lake City", "target": "SLC", "responses": ["IP", "SLC", "VPNN", "EZE", "SLC", "ICK", "SLC", "QPGR"]}
+{"prompt": "US, San Diego", "target": "SAN", "responses": ["PSPE", "SQV", "SAN", "SAY", "SAN", "SAN", "SAN", "SAN"]}
+{"prompt": "US, San Francisco", "target": "SFO", "responses": ["SKU", "SSNO", "NIE", "ORW", "SUG", "FCO", "SFO", "SFO"]}
+{"prompt": "US, Seattle", "target": "SEA", "responses": ["USR", "PRG", "SEA", "HDRJ", "YUH", "SEA", "SJL", "SEA"]}
+{"prompt": "US, Tampa", "target": "TPA", "responses": ["MCO", "YSD", "TPG", "TNQ", "TPA", "CUN", "NCE", "ZZ"]}
+{"prompt": "US, Washington", "target": "DCA", "responses": ["DCA", "DWM", "DTH", "DCA", "DCA", "ONSY", "KV", "ZK"]}
+{"prompt": "VN, Hanoi", "target": "HAN", "responses": ["KUL", "WAO", "HAN", "LQN", "WM", "HAN", "HAN", "HAN"]}
+{"prompt": "ZA, Cape Town", "target": "CPT", "responses": ["AUS", "CAI", "CPT", "CFP", "CKL", "CPT", "DOH", "CPT"]}
+{"prompt": "ZA, Johannesburg", "target": "JNB", "responses": ["JNB", "JNB", "JNB", "JNB", "JNB", "HSA", "JSB", "JNB"]}

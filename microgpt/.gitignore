@@ -1,0 +1,21 @@
+# Generated model weights
+model*.json
+
+# Training logs and rendered images
+train_*.log
+train_*.png
+*.png
+
+# LaTeX build artifacts
+*.aux
+*.toc
+*.out
+buildtime.tex
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Downloaded/temp data
+input.txt
+airport_codes_tmp.txt

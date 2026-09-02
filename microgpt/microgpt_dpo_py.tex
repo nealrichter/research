@@ -1,0 +1,281 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmonofont{DejaVuSansM Nerd Font Mono}[Scale=MatchLowercase]
+\usepackage{amsmath,amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\usepackage{datetime2}
+
+\geometry{margin=1in}
+
+% Vim-inspired color scheme
+\definecolor{vimBg}{HTML}{1E1E2E}
+\definecolor{vimFg}{HTML}{CDD6F4}
+\definecolor{vimKeyword}{HTML}{89B4FA}
+\definecolor{vimString}{HTML}{A6E3A1}
+\definecolor{vimComment}{HTML}{6C7086}
+\definecolor{vimLineNum}{HTML}{585B70}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small\color{vimFg},
+  keywordstyle=\color{vimKeyword}\bfseries,
+  commentstyle=\color{vimComment}\itshape,
+  stringstyle=\color{vimString},
+  numberstyle=\tiny\color{vimLineNum},
+  numbers=left, numbersep=10pt,
+  frame=single, rulecolor=\color{vimLineNum},
+  backgroundcolor=\color{vimBg},
+  breaklines=true, tabsize=4, showstringspaces=false,
+  xleftmargin=3em, framexleftmargin=0em,
+  morekeywords={self,True,False,None,as,with,lambda},
+}
+
+\title{\texttt{microgpt\_dpo.py} --- An Annotated Guide\\[0.3em]
+\large Direct Preference Optimization in Pure Python}
+\author{@nealrichter + Amazon Kiro}
+\date{June 29, 2026}
+
+\begin{document}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\scriptsize Generated: \today\ \input{buildtime.tex}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\fancyfoot[R]{\scriptsize Generated: \today\ \input{buildtime.tex}}}
+\maketitle
+
+\begin{abstract}
+This document walks through \texttt{microgpt\_dpo.py}, which implements Direct Preference Optimization (DPO) on top of a LoRA-finetuned microgpt model. DPO aligns a language model to human preferences without training a separate reward model, using a closed-form loss derived from the RLHF objective. The implementation demonstrates: dual model inference (policy + frozen reference), preference pair training, and the complete DPO loss computation---all in pure Python with zero dependencies.
+
+This is Stage~3 of the teaching pipeline: \textbf{pretrain} (\texttt{microgpt.py}) $\to$ \textbf{LoRA SFT} (\texttt{microgpt\_sft.py}) $\to$ \textbf{DPO} (this file). An optional visualization module (\texttt{microgpt\_viz.py}, invoked via \texttt{--viz}) renders ASCII loss sparklines and attention heat maps. An example training run is included as an appendix.
+
+\medskip
+\noindent Source: \url{https://github.com/nealrichter/research/blob/main/microgpt/microgpt_dpo.py}
+\end{abstract}
+
+\tableofcontents
+
+%----------------------------------------------------------------------
+\section{Overview}
+
+\begin{enumerate}
+  \item \textbf{Load}: SFT model as both frozen reference $\pi_{\text{ref}}$ and policy init $\pi_\theta$.
+  \item \textbf{Adapt}: LoRA on Q and V (policy only).
+  \item \textbf{Train}: DPO loss on (prompt, chosen, rejected) triples.
+  \item \textbf{Merge}: Fold adapters $\to$ \texttt{model\_dpo.json}.
+\end{enumerate}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+$\beta$ (KL penalty) & 0.3 \\
+Reference model & Frozen SFT checkpoint \\
+LoRA rank & 4 \\
+Learning rate & 0.005 \\
+Epochs & 30 \\
+Preference pairs & 140 \\
+\bottomrule
+\end{tabular}
+\caption{DPO configuration}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{The DPO Loss}
+
+DPO~\cite{rafailov2023direct} collapses the 3-stage RLHF pipeline into one loss:
+\[
+\boxed{\mathcal{L}_{\text{DPO}} = -\mathbb{E} \left[ \log \sigma\!\left( \beta \left( \log \frac{\pi_\theta(y_w|x)}{\pi_{\text{ref}}(y_w|x)} - \log \frac{\pi_\theta(y_l|x)}{\pi_{\text{ref}}(y_l|x)} \right) \right) \right]}
+\]
+
+Derived from the RLHF objective: $\max_\pi \mathbb{E}[r(x,y)] - \beta\,\text{KL}[\pi \| \pi_{\text{ref}}]$.
+
+The implicit reward is $r(x,y) = \beta \log \frac{\pi_\theta(y|x)}{\pi_{\text{ref}}(y|x)}$ --- the model \textit{is} the reward model.
+
+%----------------------------------------------------------------------
+\section{Dual Model Architecture}
+
+\subsection{Policy (differentiable, with LoRA)}
+
+\begin{lstlisting}[firstnumber=105]
+state_dict = {k: [[Value(w) for w in row] for row in mat]
+              for k, mat in model['weights'].items()}
+\end{lstlisting}
+
+\begin{lstlisting}[firstnumber=154]
+def gpt_policy(token_id, pos_id, keys, values):
+    x = [t + p for t, p in zip(state_dict['wte'][token_id],
+                                state_dict['wpe'][pos_id])]
+    x = rmsnorm(x)
+    for li in range(n_layer):
+        ...
+        q = linear_lora(x, state_dict[f'layer{li}.attn_wq'],
+                        lora_dict[f'layer{li}.attn_wq.down'],
+                        lora_dict[f'layer{li}.attn_wq.up'])
+        k = linear(x, state_dict[f'layer{li}.attn_wk'])
+        v = linear_lora(x, state_dict[f'layer{li}.attn_wv'],
+                        lora_dict[f'layer{li}.attn_wv.down'],
+                        lora_dict[f'layer{li}.attn_wv.up'])
+\end{lstlisting}
+
+\subsection{Reference (plain floats, no grad)}
+
+The reference uses raw floats for $\sim$3--5$\times$ speedup (no autograd overhead):
+
+\begin{lstlisting}[firstnumber=116]
+ref_weights = {k: [[w for w in row] for row in mat]
+               for k, mat in model['weights'].items()}
+\end{lstlisting}
+
+\begin{lstlisting}[firstnumber=186]
+def linear_ref(x, w):
+    return [sum(wo[j] * x[j] for j in range(len(x))) for wo in w]
+
+def gpt_ref(token_id, pos_id, keys, values):
+    # identical architecture, plain float arithmetic (no Value nodes)
+    ...
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{Log-Probability Computation}
+
+\[
+\log \pi(y|x) = \sum_{t=1}^{|y|} \log P(y_t \mid x, y_{<t})
+\]
+
+\begin{lstlisting}[firstnumber=231]
+def log_prob_policy(prompt_tok, resp_tok):
+    """Returns Value (differentiable)"""
+    tokens = prompt_tok + resp_tok
+    n = min(block_size, len(tokens) - 1)
+    keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
+    log_p = Value(0.0)
+    resp_start = len(prompt_tok)
+    for pos_id in range(n):
+        logits = gpt_policy(tokens[pos_id], pos_id, keys, values)
+        if pos_id >= resp_start - 1 and pos_id < len(tokens) - 1:
+            probs = softmax(logits)
+            log_p = log_p + probs[tokens[pos_id + 1]].log()
+    return log_p
+
+def log_prob_ref(prompt_tok, resp_tok):
+    """Returns float (frozen, no grad)"""
+    ...
+    log_p += math.log(probs[tokens[pos_id + 1]] + 1e-10)
+    ...
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{DPO Training Loop}
+
+\begin{lstlisting}[firstnumber=358]
+            # Policy log probs (differentiable)
+            log_pi_chosen = log_prob_policy(prompt_tok, chosen_tok)
+            log_pi_rejected = log_prob_policy(prompt_tok, rejected_tok)
+
+            # Reference log probs (frozen, float)
+            log_ref_chosen = log_prob_ref(prompt_tok, chosen_tok)
+            log_ref_rejected = log_prob_ref(prompt_tok, rejected_tok)
+
+            # DPO loss
+            reward_chosen = log_pi_chosen + Value(-log_ref_chosen)
+            reward_rejected = log_pi_rejected + Value(-log_ref_rejected)
+            logit = (reward_chosen + (reward_rejected * -1)) * beta
+            loss = (sigmoid(logit).log()) * -1
+\end{lstlisting}
+
+The loss decreases when $\pi_\theta$ assigns relatively higher probability to chosen over rejected (vs.\ reference).
+
+%----------------------------------------------------------------------
+\section{Merge and Export}
+
+\[
+W_{\text{merged}} = W_0 + \frac{\alpha}{r} \cdot W_{\text{up}} \cdot W_{\text{down}}
+\]
+
+\begin{lstlisting}[firstnumber=399]
+    for i in range(n_layer):
+        for key in (f'layer{i}.attn_wq', f'layer{i}.attn_wv'):
+            w_base = state_dict[key]
+            w_down = lora_dict[f'{key}.down']
+            w_up = lora_dict[f'{key}.up']
+            for r in range(len(w_base)):
+                for c in range(len(w_base[0])):
+                    w_base[r][c].data += lora_scale * sum(
+                        w_up[r][k].data * w_down[k][c].data
+                        for k in range(lora_rank))
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{Why DPO Over RLHF?}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+& \textbf{RLHF (PPO)} & \textbf{DPO} \\
+\midrule
+Stages & 3 (SFT $\to$ RM $\to$ PPO) & 1 \\
+Reward model & Required & Implicit \\
+Stability & Sensitive & Stable \\
+Memory & 4 models & 2 models \\
+\bottomrule
+\end{tabular}
+\caption{RLHF vs.\ DPO (Rafailov et al.~\cite{rafailov2023direct})}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Usage}
+
+\begin{lstlisting}[language=bash]
+python3 microgpt.py              # pretrain
+python3 microgpt_sft.py          # LoRA SFT
+python3 microgpt_dpo.py          # DPO -> model_dpo.json
+python3 microgpt_dpo.py -i       # inference from model_dpo.json
+python3 microgpt_dpo.py -n 500   # cap at 500 steps
+python3 microgpt_dpo.py --viz 100  # with visualization
+python3 microgpt_dpo.py -h       # help
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\begin{thebibliography}{9}
+
+\bibitem{rafailov2023direct}
+Rafailov, R., et al. \textit{Direct Preference Optimization: Your Language Model is Secretly a Reward Model}. NeurIPS, 2023.
+\url{https://arxiv.org/abs/2305.18290}
+
+\bibitem{tie2025survey}
+Tie, G., et al. \textit{A Survey on Post-training of Large Language Models}. arXiv:2503.06072, 2025.
+\url{https://arxiv.org/abs/2503.06072}
+
+\bibitem{hu2021lora}
+Hu, J.E., et al. \textit{LoRA: Low-Rank Adaptation of Large Language Models}. arXiv:2106.09685, 2021.
+\url{https://arxiv.org/abs/2106.09685}
+
+\bibitem{ouyang2022training}
+Ouyang, L., et al. \textit{Training Language Models to Follow Instructions with Human Feedback}. NeurIPS, 2022.
+\url{https://arxiv.org/abs/2203.02155}
+
+\bibitem{kingma2015adam}
+Kingma, D.P. and Ba, J. \textit{Adam: A Method for Stochastic Optimization}. ICLR, 2015.
+\url{https://arxiv.org/abs/1412.6980}
+
+\end{thebibliography}
+
+%----------------------------------------------------------------------
+\newpage
+\section*{Appendix: Example Training Run}
+\addcontentsline{toc}{section}{Appendix: Example Training Run}
+
+\textit{TBA}
+
+\end{document}

@@ -14,9 +14,10 @@ random.seed(42)
 # -h/--help: print usage and exit before doing any work
 if '-h' in sys.argv or '--help' in sys.argv:
     print(
-        "usage: python3 microgpt_sft.py [-i [MODEL.json]] [--viz [N]] [-h]\n\n"
+        "usage: python3 microgpt_sft.py [-i [MODEL.json]] [--viz [N]] [-d FILE] [-h]\n\n"
         "LoRA-finetune the pretrained model on instruction->response pairs, then sample.\n\n"
         "  -i [MODEL.json]  inference only from saved weights (default model_sft.json)\n"
+        "  -d FILE          training data file (default input_sft.txt)\n"
         "  --viz [N]        loss sparkline + attention heat map; N>0 dumps every N steps\n"
         "  -h, --help       show this help and exit"
     )
@@ -27,7 +28,9 @@ inference_only = '-i' in sys.argv
 # --viz [N]: ASCII visualization (loss sparkline + attention heat map); all logic in microgpt_viz.py
 import microgpt_viz as viz
 viz.configure(sys.argv)
-viz.tee_stdout()  # mirror all stdout into an appended train.log
+# -o flag: override output log file
+_log_file = sys.argv[sys.argv.index("-o") + 1] if "-o" in sys.argv else "train_microgpt_sft.log"
+viz.tee_stdout(_log_file, append=False)
 if inference_only:
     random.seed()
     _idx = sys.argv.index('-i')
@@ -171,18 +174,23 @@ def gpt(token_id, pos_id, keys, values):
     return linear(x, state_dict['lm_head'])
 
 # --- Load SFT data ---
+_data_file = sys.argv[sys.argv.index('-d') + 1] if '-d' in sys.argv else 'input_sft.txt'
 sft_data = []
-for line in open('input_sft.txt'):
+for line in open(_data_file):
     if '|' in line:
         instr, resp = line.strip().split('|', 1)
         sft_data.append((instr, resp))
-print(f"loaded {len(sft_data)} sft pairs from input_sft.txt")
+print(f"loaded {len(sft_data)} sft pairs from {_data_file}")
 
 def encode(text):
     return [uchars.index(ch) for ch in text if ch in uchars]
 
 # --- Inference helper ---
-test_instructions = ["fa", "mj", "fs"]
+# Sample diverse prompts from training data for test
+import random as _r_test
+_r_test.seed(7)
+_test_indices = _r_test.sample(range(len(sft_data)), min(10, len(sft_data)))
+test_instructions = [sft_data[i][0] for i in _test_indices]
 
 def run_inference(label):
     print(f"\n--- {label} ---")

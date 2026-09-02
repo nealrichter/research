@@ -126,7 +126,7 @@ def embedding_similarity(embeddings, labels, name="token embedding cosine simila
     mean = sum(off) / len(off)
     std = (sum((x - mean) ** 2 for x in off) / len(off)) ** 0.5 or 1.0
 
-    ramp = " \u2591\u2592\u2593\u2588"  # ' ' ░ ▒ ▓ █  : least -> most similar (relative to average)
+    ramp = " \u2801\u280b\u283f\u28ff\u2591\u2592\u2593\u2588"  # ' ' ⠁ ⠋ ⠿ ⣿ ░ ▒ ▓ █  (9 levels)
     def _glyph(z):
         t = max(-2.0, min(2.0, z))                      # clip to +/-2 sigma
         return ramp[int((t + 2) / 4 * (len(ramp) - 1) + 0.5)]
@@ -136,7 +136,7 @@ def embedding_similarity(embeddings, labels, name="token embedding cosine simila
     for i in range(V):
         cells = " ".join("\u2588" if i == j else _glyph((sim[i][j] - mean) / std) for j in range(V))
         print(f"  {labels[i]}  {cells}")
-    print("  legend: ' ' least  \u2591\u2592\u2593 below\u2192above avg  \u2588 most (diagonal = self)")
+    print("  legend: ' ' least  \u2801\u280b\u283f\u28ff\u2591\u2592\u2593 below\u2192above avg  \u2588 most (diagonal = self)")
 
 
 def build_causal_matrix(attn_record):
@@ -153,14 +153,18 @@ def build_causal_matrix(attn_record):
 
 
 def _cell_glyph(cell):
-    """Glyph for one heat-map cell: hollow box for masked (None), else density by value."""
+    """Glyph for one heat-map cell: □ for masked (None), else 7-level density ramp."""
     if cell is None:
         return "\u25a1"                       # □ masked / not computed
     v = cell.data if hasattr(cell, 'data') else cell
-    if v > 0.5:   return "\u2588"             # █ high
-    if v > 0.1:   return "\u2593"             # ▓ medium
-    if v > -0.1:  return "\u2591"             # ░ low / near-zero
-    return "."                                # negative
+    if v > 0.7:   return "\u2588"             # █ full
+    if v > 0.5:   return "\u2593"             # ▓ high
+    if v > 0.3:   return "\u2592"             # ▒ medium-high
+    if v > 0.15:  return "\u2591"             # ░ medium
+    if v > 0.07:  return "\u28ff"             # ⣿ medium-low
+    if v > 0.02:  return "\u283f"             # ⠿ low
+    if v > 0.005: return "\u280b"             # ⠋ very low
+    return "\u2801"                           # ⠁ epsilon/near-zero
 
 
 def visualize_heads(heads, name="Attention (causal)"):
@@ -199,15 +203,7 @@ def visualize_matrix(matrix_2d, name="Matrix"):
     for r in range(rows):
         row_str = ""
         for c in range(cols):
-            cell = matrix_2d[r][c]
-            if cell is None:                         # masked / never computed (causal future)
-                row_str += "\u25a1 "                 # □ hollow box, distinct from weak ░
-                continue
-            val = cell.data if hasattr(cell, 'data') else cell  # unwrap raw scalar from Value node
-            if val > 0.5:     row_str += "\u2588 "  # highly active
-            elif val > 0.1:   row_str += "\u2593 "  # moderately active
-            elif val > -0.1:  row_str += "\u2591 "  # neutral / near-zero
-            else:             row_str += ". "        # negative / inactive
+            row_str += _cell_glyph(matrix_2d[r][c]) + " "
         print(row_str)
 
 
@@ -324,9 +320,10 @@ class _Tee:
         return getattr(self._stream, name)
 
 
-def tee_stdout(path="train.log"):
-    """Append everything written to stdout into `path` (also still printed to the terminal)."""
+def tee_stdout(path="train.log", append=True):
+    """Mirror everything written to stdout into `path` (also still printed to the terminal).
+    If append=False, the file is cleared first."""
     import sys, datetime
-    fh = open(path, "a")
+    fh = open(path, "a" if append else "w")
     fh.write(f"\n===== run {datetime.datetime.now().isoformat(timespec='seconds')} | {' '.join(sys.argv)} =====\n")
     sys.stdout = _Tee(sys.stdout, fh)

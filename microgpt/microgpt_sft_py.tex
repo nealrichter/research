@@ -1,0 +1,257 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmonofont{DejaVuSansM Nerd Font Mono}[Scale=MatchLowercase]
+\usepackage{amsmath,amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{graphicx}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\usepackage{datetime2}
+
+\geometry{margin=1in}
+
+% Vim-inspired color scheme
+\definecolor{vimBg}{HTML}{1E1E2E}
+\definecolor{vimFg}{HTML}{CDD6F4}
+\definecolor{vimKeyword}{HTML}{89B4FA}
+\definecolor{vimString}{HTML}{A6E3A1}
+\definecolor{vimComment}{HTML}{6C7086}
+\definecolor{vimLineNum}{HTML}{585B70}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small\color{vimFg},
+  keywordstyle=\color{vimKeyword}\bfseries,
+  commentstyle=\color{vimComment}\itshape,
+  stringstyle=\color{vimString},
+  numberstyle=\tiny\color{vimLineNum},
+  numbers=left, numbersep=10pt,
+  frame=single, rulecolor=\color{vimLineNum},
+  backgroundcolor=\color{vimBg},
+  breaklines=true, tabsize=4, showstringspaces=false,
+  xleftmargin=3em, framexleftmargin=0em,
+  morekeywords={self,True,False,None,as,with,lambda},
+}
+
+\title{\texttt{microgpt\_sft.py} --- An Annotated Guide\\[0.3em]
+\large LoRA Supervised Fine-Tuning in Pure Python}
+\author{@nealrichter + Amazon Kiro}
+\date{June 29, 2026}
+
+\begin{document}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\fancyfoot[R]{\scriptsize Generated: \today\ \input{buildtime.tex}}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\fancyfoot[R]{\scriptsize Generated: \today\ \input{buildtime.tex}}}
+\maketitle
+
+\begin{abstract}
+This document walks through \texttt{microgpt\_sft.py}, which implements LoRA (Low-Rank Adaptation) supervised fine-tuning on top of a pretrained microgpt model. It demonstrates the complete SFT pipeline: loading a frozen base model, attaching trainable low-rank adapters, training with response-only loss masking, and merging adapters back into the base weights. All in pure Python with zero dependencies.
+
+This is Stage~2 of the teaching pipeline: \textbf{pretrain} (\texttt{microgpt.py}) $\to$ \textbf{LoRA SFT} (this file) $\to$ \textbf{DPO} (\texttt{microgpt\_dpo.py}). An optional visualization module (\texttt{microgpt\_viz.py}, invoked via \texttt{--viz}) renders ASCII loss sparklines and attention heat maps. An example training run is included as an appendix.
+
+\medskip
+\noindent Source: \url{https://github.com/nealrichter/research/blob/main/microgpt/microgpt_sft.py}
+\end{abstract}
+
+\tableofcontents
+
+%----------------------------------------------------------------------
+\section{Overview}
+
+\begin{enumerate}
+  \item \textbf{Load}: Pretrained weights from \texttt{model.json} (frozen).
+  \item \textbf{Adapt}: LoRA on Q and V projections (256 trainable params).
+  \item \textbf{Train}: Response-only cross-entropy on instruction$\to$response pairs.
+  \item \textbf{Merge}: Fold adapters into base weights $\to$ \texttt{model\_sft.json}.
+\end{enumerate}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+LoRA rank ($r$) & 4 \\
+LoRA alpha ($\alpha$) & 8 \\
+Target modules & attn\_wq, attn\_wv \\
+Trainable params & 256 (5.7\% of base) \\
+Epochs & 50 \\
+\bottomrule
+\end{tabular}
+\caption{LoRA SFT configuration}
+\end{table}
+
+%----------------------------------------------------------------------
+\section{Frozen Base Model}
+
+\begin{lstlisting}[firstnumber=95]
+state_dict = {k: [[Value(w) for w in row] for row in mat]
+              for k, mat in model['weights'].items()}
+
+# Extend embedding tables for SEP token if needed
+for key in ('wte', 'lm_head'):
+    if len(state_dict[key]) < vocab_size:
+        state_dict[key].append([Value(random.gauss(0, 0.08))
+                                for _ in range(n_embd)])
+
+block_size = 32
+while len(state_dict['wpe']) < block_size:
+    state_dict['wpe'].append([Value(random.gauss(0, 0.08))
+                              for _ in range(n_embd)])
+
+base_params = [p for mat in state_dict.values()
+               for row in mat for p in row]
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{LoRA Adapters}
+
+LoRA~\cite{hu2021lora} adds trainable low-rank matrices while keeping base weights frozen:
+\[
+h = W_0 x + \frac{\alpha}{r} \cdot W_{\text{up}} \cdot W_{\text{down}} \cdot x
+\]
+
+$W_{\text{down}}$ is randomly initialized; $W_{\text{up}}$ is zeros (no perturbation at init).
+
+\begin{lstlisting}[firstnumber=110]
+# --- LoRA adapters on Q and V projections ---
+lora_rank = 4
+lora_alpha = 8
+lora_scale = lora_alpha / lora_rank
+
+matrix = lambda nout, nin, std=0.08: [[Value(random.gauss(0, std))
+    for _ in range(nin)] for _ in range(nout)]
+
+lora_dict = {}
+for i in range(n_layer):
+    lora_dict[f'layer{i}.attn_wq.down'] = matrix(lora_rank, n_embd)
+    lora_dict[f'layer{i}.attn_wq.up'] = [[Value(0.0)
+        for _ in range(lora_rank)] for _ in range(n_embd)]
+    lora_dict[f'layer{i}.attn_wv.down'] = matrix(lora_rank, n_embd)
+    lora_dict[f'layer{i}.attn_wv.up'] = [[Value(0.0)
+        for _ in range(lora_rank)] for _ in range(n_embd)]
+
+lora_params = [p for mat in lora_dict.values()
+               for row in mat for p in row]
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{LoRA-Augmented Forward Pass}
+
+\begin{lstlisting}[firstnumber=128]
+def linear(x, w):
+    return [sum(wi * xi for wi, xi in zip(wo, x)) for wo in w]
+
+def linear_lora(x, w_base, w_down, w_up):
+    """h = W_base @ x + scale * W_up @ (W_down @ x)"""
+    return [b + lora_scale * l for b, l in zip(
+        linear(x, w_base), linear(linear(x, w_down), w_up))]
+\end{lstlisting}
+
+Applied only to Q and V in attention (K and MLP unchanged)~\cite{hu2021lora}:
+
+\begin{lstlisting}[firstnumber=144]
+def gpt(token_id, pos_id, keys, values):
+    ...
+        q = linear_lora(x, state_dict[f'layer{li}.attn_wq'],
+                lora_dict[f'layer{li}.attn_wq.down'],
+                lora_dict[f'layer{li}.attn_wq.up'])
+        k = linear(x, state_dict[f'layer{li}.attn_wk'])
+        v = linear_lora(x, state_dict[f'layer{li}.attn_wv'],
+                lora_dict[f'layer{li}.attn_wv.down'],
+                lora_dict[f'layer{li}.attn_wv.up'])
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{Response-Only Loss Masking}
+
+Loss computed only on response tokens~\cite{wei2022finetuned}:
+\[
+\mathcal{L}_{\text{SFT}} = -\frac{1}{|R|} \sum_{j \in R} \log P(t_j \mid t_1, \ldots, t_{j-1})
+\]
+where $R$ = positions after SEP.
+
+\begin{lstlisting}[firstnumber=224]
+        for instruction, response in sft_data:
+            instr_tok = encode(instruction)
+            resp_tok = encode(response)
+            tokens = [BOS] + instr_tok + [SEP] + resp_tok + [BOS]
+            n = min(block_size, len(tokens) - 1)
+            resp_start = len(instr_tok) + 2
+
+            keys, values = [[] for _ in range(n_layer)],
+                           [[] for _ in range(n_layer)]
+            losses = []
+            for pos_id in range(n):
+                logits = gpt(tokens[pos_id], pos_id, keys, values)
+                if pos_id >= resp_start - 1:
+                    probs = softmax(logits)
+                    losses.append(-probs[tokens[pos_id + 1]].log())
+
+            loss = (1 / len(losses)) * sum(losses)
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{LoRA Merge and Export}
+
+\[
+W_{\text{merged}} = W_0 + \frac{\alpha}{r} \cdot W_{\text{up}} \cdot W_{\text{down}}
+\]
+
+\begin{lstlisting}[firstnumber=268]
+    # --- Merge LoRA into base and save ---
+    for i in range(n_layer):
+        for key in (f'layer{i}.attn_wq', f'layer{i}.attn_wv'):
+            w_base = state_dict[key]
+            w_down = lora_dict[f'{key}.down']
+            w_up = lora_dict[f'{key}.up']
+            for r in range(len(w_base)):
+                for c in range(len(w_base[0])):
+                    w_base[r][c].data += lora_scale * sum(
+                        w_up[r][k].data * w_down[k][c].data
+                        for k in range(lora_rank))
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\section{Usage}
+
+\begin{lstlisting}[language=bash]
+python3 microgpt.py              # pretrain (required first)
+python3 microgpt_sft.py          # LoRA SFT -> model_sft.json
+python3 microgpt_sft.py -i       # inference from model_sft.json
+python3 microgpt_sft.py --viz 50 # train with visualization
+python3 microgpt_sft.py -h       # help
+\end{lstlisting}
+
+%----------------------------------------------------------------------
+\begin{thebibliography}{9}
+
+\bibitem{hu2021lora}
+Hu, J.E., et al. \textit{LoRA: Low-Rank Adaptation of Large Language Models}. arXiv:2106.09685, 2021.
+\url{https://arxiv.org/abs/2106.09685}
+
+\bibitem{wei2022finetuned}
+Wei, J., et al. \textit{Finetuned Language Models Are Zero-Shot Learners}. ICLR, 2022.
+\url{https://arxiv.org/abs/2109.01652}
+
+\bibitem{kingma2015adam}
+Kingma, D.P. and Ba, J. \textit{Adam: A Method for Stochastic Optimization}. ICLR, 2015.
+\url{https://arxiv.org/abs/1412.6980}
+
+\end{thebibliography}
+
+%----------------------------------------------------------------------
+\newpage
+\section*{Appendix: Example Training Run}
+\addcontentsline{toc}{section}{Appendix: Example Training Run}
+
+\textit{TBA}
+
+\end{document}

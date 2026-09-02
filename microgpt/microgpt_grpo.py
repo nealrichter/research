@@ -1,13 +1,18 @@
 """
-DPO (Direct Preference Optimization) for microgpt.
+GRPO (Group Relative Policy Optimization) for microgpt.
 Loads SFT model from model_sft.json as reference policy, trains LoRA adapters
-on preference pairs (prompt, chosen, rejected) using the DPO loss.
-Outputs merged model to model_dpo.json.
+using group-sampled completions scored by a rule-based reward function.
+No critic/value network required — advantages are group-relative.
+Outputs merged model to model_grpo.json.
+
+Supports two modes:
+  Online (default): generates G completions per prompt at runtime via sampling.
+  Offline (--offline FILE): reads pre-generated response groups from a JSONL file,
+    skipping the expensive generation step. Useful when a stronger teacher model
+    has pre-generated the rollouts.
 
 Pure Python, zero dependencies.
-Based on Rafailov et al. "Direct Preference Optimization" (NeurIPS 2023).
-
-Verified by Gemini.
+Based on Shao et al. "DeepSeekMath" (2024) and DeepSeek-AI "DeepSeek-R1" (2025).
 """
 
 import json, math, random, sys, os, signal
@@ -16,10 +21,13 @@ random.seed(42)
 # -h/--help: print usage and exit before doing any work
 if '-h' in sys.argv or '--help' in sys.argv:
     print(
-        "usage: python3 microgpt_dpo.py [-i [MODEL.json]] [--viz [N]] [-n STEPS] [-d FILE] [-h]\n\n"
-        "DPO-align the SFT model on preference pairs, then generate samples.\n\n"
-        "  -i [MODEL.json]  inference only from saved weights (default model_dpo.json)\n"
-        "  -d FILE          training data file (default input_dpo.txt)\n"
+        "usage: python3 microgpt_grpo.py [-i [MODEL.json]] [--viz [N]] [-n STEPS]\n"
+        "                                [--offline FILE] [-d FILE] [-h]\n\n"
+        "GRPO-align the SFT model using group-relative rewards, then generate samples.\n\n"
+        "  -i [MODEL.json]  inference only from saved weights (default model_grpo.json)\n"
+        "  -d FILE          training data file (default input_sft.txt, online mode)\n"
+        "  --offline FILE   offline mode: read pre-generated groups from JSONL file\n"
+        "                   (skips runtime generation; see input_grpo_offline.jsonl)\n"
         "  --viz [N]        loss sparkline + attention heat map; N>0 dumps every N steps\n"
         "  -n STEPS         cap training to STEPS steps\n"
         "  -h, --help       show this help and exit"
@@ -28,11 +36,23 @@ if '-h' in sys.argv or '--help' in sys.argv:
 
 # -i flag: inference-only mode
 inference_only = '-i' in sys.argv
+# --offline FILE: offline mode (pre-generated groups from JSONL)
+offline_mode = '--offline' in sys.argv
+offline_file = None
+if offline_mode:
+    _idx = sys.argv.index('--offline')
+    if _idx + 1 < len(sys.argv) and not sys.argv[_idx + 1].startswith('-'):
+        offline_file = sys.argv[_idx + 1]
+    else:
+        offline_file = 'input_grpo_offline.jsonl'
+    if not inference_only and not os.path.exists(offline_file):
+        print(f"error: offline data file '{offline_file}' not found.")
+        sys.exit(1)
 # --viz [N]: ASCII visualization (loss sparkline + attention heat map); all logic in microgpt_viz.py
 import microgpt_viz as viz
 viz.configure(sys.argv)
 # -o flag: override output log file
-_log_file = sys.argv[sys.argv.index("-o") + 1] if "-o" in sys.argv else "train_microgpt_dpo.log"
+_log_file = sys.argv[sys.argv.index("-o") + 1] if "-o" in sys.argv else "train_microgpt_grpo.log"
 viz.tee_stdout(_log_file, append=False)
 # -n flag: max training steps
 max_steps = None
@@ -42,9 +62,9 @@ if inference_only:
     random.seed()
     _idx = sys.argv.index('-i')
     _nxt = sys.argv[_idx + 1] if _idx + 1 < len(sys.argv) else ''
-    model_file = _nxt if _nxt and not _nxt.startswith('-') else 'model_dpo.json'  # ignore following flags
+    model_file = _nxt if _nxt and not _nxt.startswith('-') else 'model_grpo.json'
     if not os.path.exists(model_file):
-        print(f"error: {model_file} not found. Run `python3 microgpt_dpo.py` first.")
+        print(f"error: {model_file} not found. Run `python3 microgpt_grpo.py` first.")
         sys.exit(1)
 
 # --- Load SFT model (serves as both reference and init for policy) ---
@@ -174,7 +194,7 @@ def gpt_policy(token_id, pos_id, keys, values):
             attn_logits = [sum(q_h[j] * k_h[t][j] for j in range(head_dim)) / head_dim**0.5
                           for t in range(len(k_h))]
             attn_weights = softmax(attn_logits)
-            if viz.enabled: viz.attn(pos_id, h, attn_weights)  # cache head-0 attention (policy only)
+            if viz.enabled: viz.attn(pos_id, h, attn_weights)
             x_attn.extend([sum(attn_weights[t] * v_h[t][j] for t in range(len(v_h)))
                           for j in range(head_dim)])
         x = [a + b for a, b in zip(linear(x_attn, state_dict[f'layer{li}.attn_wo']), x_res)]
@@ -229,8 +249,32 @@ def gpt_ref(token_id, pos_id, keys, values):
 def encode(text):
     return [uchars.index(ch) for ch in text if ch in uchars]
 
+def generate_policy(prompt_tok, max_len=12, temperature=1.2):
+    """Sample a completion from the current policy (no gradient tracking)."""
+    keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
+    # Feed prompt
+    for pos_id, tid in enumerate(prompt_tok[:-1]):
+        gpt_policy(tid, pos_id, keys, values)
+    tid, pos_id = prompt_tok[-1], len(prompt_tok) - 1
+    out = []
+    for _ in range(max_len):
+        logits = gpt_policy(tid, pos_id, keys, values)
+        # Sample from softmax with temperature (use .data to avoid building graph)
+        max_l = max(l.data for l in logits)
+        exps = [math.exp((l.data - max_l) / temperature) for l in logits]
+        total = sum(exps)
+        probs = [e / total for e in exps]
+        tid = random.choices(range(vocab_size), weights=probs)[0]
+        if tid in (BOS, SEP):
+            break
+        out.append(tid)
+        pos_id += 1
+        if pos_id >= block_size - 1:
+            break
+    return out
+
 def log_prob_policy(prompt_tok, resp_tok):
-    """Sum of log P(resp_t | prompt, resp_<t) under policy (returns Value for grad)"""
+    """Sum of log P(resp_t | prompt, resp_<t) under policy (returns Value for grad)."""
     tokens = prompt_tok + resp_tok
     n = min(block_size, len(tokens) - 1)
     keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
@@ -244,7 +288,7 @@ def log_prob_policy(prompt_tok, resp_tok):
     return log_p
 
 def log_prob_ref(prompt_tok, resp_tok):
-    """Sum of log P(resp_t | prompt, resp_<t) under reference (returns float)"""
+    """Sum of log P(resp_t | prompt, resp_<t) under reference (returns float)."""
     tokens = prompt_tok + resp_tok
     n = min(block_size, len(tokens) - 1)
     keys, values = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
@@ -257,55 +301,137 @@ def log_prob_ref(prompt_tok, resp_tok):
             log_p += math.log(probs[tokens[pos_id + 1]] + 1e-10)
     return log_p
 
-# --- Preference data: (prompt, chosen, rejected) ---
-# Format: prompt|chosen|rejected
-_data_file = sys.argv[sys.argv.index('-d') + 1] if '-d' in sys.argv else 'input_dpo.txt'
-dpo_data = []
-if os.path.exists(_data_file):
-    for line in open(_data_file):
-        parts = line.strip().split('|')
-        if len(parts) == 3:
-            dpo_data.append(tuple(parts))
+# --- Reward functions (rule-based, no learned reward model) ---
+def reward_fn(prompt_str, response_tok):
+    """
+    Score a completion with a rule-based reward.
+    For the names domain:
+      - Length reward: smooth reward for plausible name lengths (3-8 chars)
+      - Character quality: reward lowercase letters, penalize repeats
+      - Exact/partial match bonus against known correct names
+    Returns a float reward. Uses continuous scoring to avoid uniform groups.
+    """
+    response_str = ''.join(uchars[t] for t in response_tok if t < len(uchars))
+    r = 0.0
+
+    # Empty or degenerate
+    if len(response_str) == 0:
+        return -1.0
+
+    # Length reward (smooth): ideal is 4-7 chars for a name
+    n = len(response_str)
+    if n <= 2:
+        r += 0.1 * n
+    elif 3 <= n <= 8:
+        r += 1.0 + 0.1 * (min(n, 6) - 3)  # peaks at 6
+    else:
+        r += max(0, 1.0 - 0.15 * (n - 8))  # taper off
+
+    # Character diversity: penalize repeated chars
+    if n > 1:
+        unique_ratio = len(set(response_str)) / n
+        r += unique_ratio * 0.5
+
+    # Letter quality: reward if mostly lowercase letters
+    alpha_count = sum(1 for c in response_str if c.isalpha())
+    if n > 0:
+        r += (alpha_count / n) * 0.3
+
+    # Check if it matches known correct names from SFT data
+    sft_correct = {
+        'fa': ['alice', 'anna', 'amelia'],
+        'mb': ['benjamin', 'brian'],
+        'fc': ['charlotte'],
+        'md': ['daniel'],
+        'fe': ['emily'],
+        'mf': ['frank'],
+        'fg': ['grace'],
+        'mh': ['henry'],
+        'fi': ['isabella'],
+        'mj': ['james'],
+        'fk': ['katherine'],
+        'ml': ['lucas'],
+        'fm': ['maria'],
+        'mn': ['nathan'],
+        'fo': ['olivia'],
+        'mp': ['patrick'],
+        'fr': ['rachel'],
+        'ms': ['samuel'],
+        'ft': ['teresa'],
+        'mw': ['william'],
+    }
+    if prompt_str in sft_correct:
+        best_match = 0.0
+        for correct in sft_correct[prompt_str]:
+            if response_str.lower() == correct:
+                best_match = 3.0  # exact match
+                break
+            # Partial match: shared prefix length
+            prefix_len = 0
+            for a, b in zip(response_str.lower(), correct):
+                if a == b:
+                    prefix_len += 1
+                else:
+                    break
+            if prefix_len > 0:
+                best_match = max(best_match, 0.5 + prefix_len * 0.4)
+        r += best_match
+
+    return r
+
+def reward_fn_offline(response_str, target_str):
+    """
+    Rule-based reward for offline mode.
+    Binary scoring: +1.0 for exact match, -1.0 for wrong.
+    Clean signal for GRPO — no partial credit noise.
+    """
+    if not response_str:
+        return -1.0
+    if response_str.strip() == target_str.strip():
+        return 1.0
+    return -1.0
+
+# --- GRPO training data ---
+# Online mode: load prompts from input_sft.txt (or defaults)
+# Offline mode: load pre-generated groups from JSONL file
+grpo_prompts = []
+offline_data = []
+
+if offline_mode:
+    # Offline: read pre-generated response groups from JSONL
+    with open(offline_file) as f:
+        for line in f:
+            if line.strip():
+                offline_data.append(json.loads(line.strip()))
+    print(f"loaded {len(offline_data)} offline groups from {offline_file}")
 else:
-    # Default preference pairs for teaching (names domain)
-    # Chosen = correct name for the code, Rejected = wrong name
-    dpo_data = [
-        ("fa", "Alice", "Bob"),
-        ("mb", "Benjamin", "Alice"),
-        ("fc", "Charlotte", "Daniel"),
-        ("md", "Daniel", "Charlotte"),
-        ("fe", "Emily", "Frank"),
-        ("mf", "Frank", "Emily"),
-        ("fg", "Grace", "Henry"),
-        ("mh", "Henry", "Grace"),
-        ("fi", "Isabella", "James"),
-        ("mj", "James", "Isabella"),
-        ("fk", "Katherine", "Lucas"),
-        ("ml", "Lucas", "Katherine"),
-        ("fm", "Maria", "Nathan"),
-        ("mn", "Nathan", "Maria"),
-        ("fo", "Olivia", "Patrick"),
-        ("mp", "Patrick", "Olivia"),
-        ("fr", "Rachel", "Samuel"),
-        ("ms", "Samuel", "Rachel"),
-        ("ft", "Teresa", "William"),
-        ("mw", "William", "Teresa"),
-    ]
-print(f"loaded {len(dpo_data)} preference pairs")
+    # Online: just prompts (responses generated at runtime)
+    _data_file = sys.argv[sys.argv.index('-d') + 1] if '-d' in sys.argv else 'input_sft.txt'
+    if os.path.exists(_data_file):
+        for line in open(_data_file):
+            parts = line.strip().split('|')
+            if len(parts) >= 1:
+                grpo_prompts.append(parts[0])
+    else:
+        grpo_prompts = ["fa", "mb", "fc", "md", "fe", "mf", "fg", "mh",
+                        "fi", "mj", "fk", "ml", "fm", "mn", "fo", "mp",
+                        "fr", "ms", "ft", "mw"]
+    print(f"loaded {len(grpo_prompts)} prompts for GRPO (online)")
 
-# --- Sigmoid helper ---
-def sigmoid(x):
-    """Numerically stable sigmoid for Value nodes"""
-    if isinstance(x, Value):
-        return Value(1.0) / (Value(1.0) + (x * -1).exp())
-    return 1.0 / (1.0 + math.exp(-x))
+# --- GRPO hyperparameters ---
+G = 8              # group size: completions per prompt (online only; offline uses file)
+beta = 0.1         # KL penalty coefficient
+epsilon = 0.2      # PPO clipping parameter
+gen_temp = 1.2     # sampling temperature for group generation (online only)
 
-# --- Inference helper ---
 # --- Inference helper ---
 # Sample diverse prompts from training data for test
 import random as _r_test
 _r_test.seed(7)
-_test_pool = [t[0] for t in dpo_data] if dpo_data else ["fa", "mj", "fs"]
+if offline_mode:
+    _test_pool = [rec['prompt'] for rec in offline_data]
+else:
+    _test_pool = grpo_prompts if grpo_prompts else ["fa", "mj", "fs", "mb", "fk"]
 test_instructions = _r_test.sample(_test_pool, min(10, len(_test_pool)))
 
 def run_inference(label):
@@ -327,23 +453,28 @@ def run_inference(label):
 
 # --- Inference or Training ---
 if inference_only:
-    run_inference("DPO model inference")
+    run_inference("GRPO model inference")
 else:
-    run_inference("BEFORE DPO (SFT model)")
+    run_inference("BEFORE GRPO (SFT model)")
 
-    # --- DPO training ---
-    print("\n--- DPO training ---")
-    beta = 0.3  # KL penalty strength
-    lr, beta1, beta2, eps = 0.005, 0.85, 0.99, 1e-8
+    # --- GRPO training ---
+    mode_label = "offline" if offline_mode else "online"
+    print(f"\n--- GRPO training ({mode_label}) ---")
+    if offline_mode:
+        print(f"  groups={len(offline_data)}, beta={beta}, epsilon={epsilon}")
+    else:
+        print(f"  group_size={G}, beta={beta}, epsilon={epsilon}, temperature={gen_temp}")
+    lr, beta1, beta2, eps_adam = 0.001, 0.85, 0.99, 1e-8
     m = [0.0] * len(lora_params)
     v_buf = [0.0] * len(lora_params)
-    num_epochs = 30
-    total_steps = num_epochs * len(dpo_data)
+    num_epochs = 5
+    data_len = len(offline_data) if offline_mode else len(grpo_prompts)
+    total_steps = num_epochs * data_len
     if max_steps:
         total_steps = min(total_steps, max_steps)
     step = 0
     stopped = [False]
-    first_loss = last_loss = None  # end-to-end loss trajectory
+    first_loss = last_loss = None
 
     def handle_sigint(sig, frame):
         stopped[0] = True
@@ -353,37 +484,113 @@ else:
     for epoch in range(num_epochs):
         if stopped[0]:
             break
-        random.shuffle(dpo_data)
-        for prompt_str, chosen_str, rejected_str in dpo_data:
+        if offline_mode:
+            random.shuffle(offline_data)
+        else:
+            random.shuffle(grpo_prompts)
+
+        items = offline_data if offline_mode else grpo_prompts
+        for item in items:
             if stopped[0] or step >= total_steps:
                 stopped[0] = True
                 break
-            prompt_tok = [BOS] + encode(prompt_str) + [SEP]
-            chosen_tok = encode(chosen_str) + [BOS]
-            rejected_tok = encode(rejected_str) + [BOS]
 
-            # Policy log probs (differentiable)
-            log_pi_chosen = log_prob_policy(prompt_tok, chosen_tok)
-            log_pi_rejected = log_prob_policy(prompt_tok, rejected_tok)
+            # --- Branch: Online vs Offline data preparation ---
+            if offline_mode:
+                # Offline: read pre-generated group from JSONL record
+                prompt_str = item['prompt']
+                target_str = item['target']
+                responses_str = item['responses']
+                prompt_tok = [BOS] + encode(prompt_str) + [SEP]
+                group_responses = [encode(r) + [BOS] for r in responses_str]
+                rewards = [reward_fn_offline(r, target_str) for r in responses_str]
+                G_eff = len(group_responses)
+            else:
+                # Online: generate G completions from current policy
+                prompt_str = item
+                prompt_tok = [BOS] + encode(prompt_str) + [SEP]
+                group_responses = []
+                for _ in range(G):
+                    resp = generate_policy(prompt_tok, max_len=12, temperature=gen_temp)
+                    group_responses.append(resp)
+                rewards = [reward_fn(prompt_str, resp) for resp in group_responses]
+                G_eff = G
 
-            # Reference log probs (frozen, float)
-            log_ref_chosen = log_prob_ref(prompt_tok, chosen_tok)
-            log_ref_rejected = log_prob_ref(prompt_tok, rejected_tok)
+            # --- Step 3: Advantage Calculation (group-relative) ---
+            mean_r = sum(rewards) / G_eff
+            var_r = sum((r - mean_r) ** 2 for r in rewards) / G_eff
+            std_r = (var_r + 1e-8) ** 0.5
+            advantages = [(r - mean_r) / std_r for r in rewards]
 
-            # DPO loss: -log σ(β * ((log π_θ(y_w|x) - log π_ref(y_w|x)) - (log π_θ(y_l|x) - log π_ref(y_l|x))))
-            reward_chosen = log_pi_chosen + Value(-log_ref_chosen)
-            reward_rejected = log_pi_rejected + Value(-log_ref_rejected)
-            logit = (reward_chosen + (reward_rejected * -1)) * beta
-            loss = (sigmoid(logit).log()) * -1
+            # Skip if all rewards are identical (no signal)
+            if var_r < 1e-10:
+                step += 1
+                if viz.enabled:
+                    viz.step(step - 1, total_steps, 0.0)
+                else:
+                    print(f"  step {step:4d}/{total_steps} | skipped (uniform rewards)", end='\r')
+                continue
+
+            # --- Step 4: Compute old log-probs (detached, for ratio) ---
+            old_log_probs = []
+            for resp_tok in group_responses:
+                tokens = prompt_tok + resp_tok
+                n = min(block_size, len(tokens) - 1)
+                keys_tmp, values_tmp = [[] for _ in range(n_layer)], [[] for _ in range(n_layer)]
+                lp = 0.0
+                resp_start = len(prompt_tok)
+                for pos_id in range(n):
+                    logits = gpt_policy(tokens[pos_id], pos_id, keys_tmp, values_tmp)
+                    if pos_id >= resp_start - 1 and pos_id < len(tokens) - 1:
+                        probs_data = softmax(logits)
+                        lp += math.log(probs_data[tokens[pos_id + 1]].data + 1e-10)
+                old_log_probs.append(lp)
+
+            # --- Step 5: GRPO Loss (clipped surrogate + KL penalty) ---
+            loss = Value(0.0)
+            for resp_tok, adv, old_lp in zip(group_responses, advantages, old_log_probs):
+                if len(resp_tok) == 0:
+                    continue
+
+                # Current policy log-prob (differentiable)
+                log_pi = log_prob_policy(prompt_tok, resp_tok)
+
+                # Reference log-prob (frozen float)
+                log_ref = log_prob_ref(prompt_tok, resp_tok)
+
+                # Probability ratio: exp(log_pi - log_pi_old)
+                log_ratio = log_pi + Value(-old_lp)
+                ratio = log_ratio.exp()
+
+                # Clipped surrogate objective
+                unclipped = ratio * adv
+
+                # clip(ratio, 1-eps, 1+eps) * advantage
+                # If ratio is outside bounds, use constant (stops gradient)
+                if ratio.data < 1 - epsilon:
+                    clipped = Value((1 - epsilon) * adv)
+                elif ratio.data > 1 + epsilon:
+                    clipped = Value((1 + epsilon) * adv)
+                else:
+                    clipped = ratio * adv
+
+                # min(unclipped, clipped) — pessimistic bound
+                surrogate = unclipped if unclipped.data < clipped.data else clipped
+
+                # KL penalty: approximate KL(pi_theta || pi_ref)
+                kl_penalty = (log_pi + Value(-log_ref)) * beta
+
+                # Accumulate: maximize surrogate - KL -> minimize -(surrogate - KL)
+                loss = loss - (surrogate - kl_penalty) * (1.0 / G_eff)
 
             loss.backward()
 
-            # Update only LoRA params
+            # --- Adam update (LoRA params only) ---
             lr_t = lr * (1 - step / total_steps)
             for i, p in enumerate(lora_params):
                 m[i] = beta1 * m[i] + (1 - beta1) * p.grad
                 v_buf[i] = beta2 * v_buf[i] + (1 - beta2) * p.grad ** 2
-                p.data -= lr_t * (m[i] / (1 - beta1 ** (step + 1))) / ((v_buf[i] / (1 - beta2 ** (step + 1))) ** 0.5 + eps)
+                p.data -= lr_t * (m[i] / (1 - beta1 ** (step + 1))) / ((v_buf[i] / (1 - beta2 ** (step + 1))) ** 0.5 + eps_adam)
                 p.grad = 0
             for p in base_params:
                 p.grad = 0
@@ -391,16 +598,17 @@ else:
             if first_loss is None: first_loss = loss.data
             last_loss = loss.data
             step += 1
+            avg_reward = mean_r
             if viz.enabled:
                 viz.step(step - 1, total_steps, loss.data)
             else:
-                print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f}", end='\r')
+                print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f} | avg_reward {avg_reward:.2f}", end='\r')
 
-    # --- After DPO ---
+    # --- After GRPO ---
     if first_loss is not None:
         _pct = (last_loss - first_loss) / first_loss * 100 if first_loss else 0.0
-        print(f"\nLoss (DPO preference) {first_loss:.4f} -> {last_loss:.4f}  ({_pct:+.1f}%)")
-    run_inference("\nAFTER DPO")
+        print(f"\nLoss (GRPO {mode_label}) {first_loss:.4f} -> {last_loss:.4f}  ({_pct:+.1f}%)")
+    run_inference("AFTER GRPO")
 
     # --- Merge LoRA into base and save ---
     for i in range(n_layer):
@@ -412,11 +620,11 @@ else:
                 for c in range(len(w_base[0])):
                     w_base[r][c].data += lora_scale * sum(w_up[r][k].data * w_down[k][c].data for k in range(lora_rank))
 
-    with open('model_dpo.json', 'w') as f:
+    with open('model_grpo.json', 'w') as f:
         json.dump({'vocab': uchars,
                    'config': {'n_layer': n_layer, 'n_embd': n_embd, 'block_size': block_size, 'n_head': n_head},
                    'weights': {k: [[p.data for p in row] for row in mat] for k, mat in state_dict.items()}}, f)
-    print(f"\nsaved model_dpo.json (run: python3 microgpt_dpo.py -i)")
+    print(f"\nsaved model_grpo.json (run: python3 microgpt_grpo.py -i)")
 
 # end-of-run visualization (tall loss sparkline + attention matrix); no-op without --viz
 if viz.enabled:

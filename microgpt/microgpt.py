@@ -21,9 +21,10 @@ random.seed(42) # Let there be order among chaos
 # -h/--help: print usage and exit before doing any work
 if '-h' in sys.argv or '--help' in sys.argv:
     print(
-        "usage: python3 microgpt.py [-i [MODEL.json]] [--viz [N]] [-h]\n\n"
+        "usage: python3 microgpt.py [-i [MODEL.json]] [--viz [N]] [-d FILE] [-h]\n\n"
         "Train a tiny char-level GPT on names, then generate samples.\n\n"
         "  -i [MODEL.json]  inference only from saved weights (default model.json)\n"
+        "  -d FILE          training data file (default input.txt)\n"
         "  --viz [N]        loss sparkline + attention heat map; N>0 dumps every N steps\n"
         "  -h, --help       show this help and exit"
     )
@@ -37,7 +38,9 @@ inference_only = '-i' in sys.argv
 # every hook below is guarded by `viz.enabled`, so an absent --viz runs none of the new logic.
 import microgpt_viz as viz
 viz.configure(sys.argv)
-viz.tee_stdout()  # mirror all stdout into an appended train.log
+# -o flag: override output log file
+_log_file = sys.argv[sys.argv.index("-o") + 1] if "-o" in sys.argv else "train_microgpt.log"
+viz.tee_stdout(_log_file, append=False)
 
 if inference_only:
     random.seed()  # non-deterministic sampling for inference-only mode
@@ -61,11 +64,16 @@ if inference_only:
     vocab_size = len(model['weights']['wte'])  # trust actual weight dimensions
 else:
     # Let there be a Dataset `docs`: list[str] of documents (e.g. a list of names)
-    if not os.path.exists('input.txt'):
-        import urllib.request
-        names_url = 'https://raw.githubusercontent.com/karpathy/makemore/988aa59/names.txt'
-        urllib.request.urlretrieve(names_url, 'input.txt')
-    docs = [line.strip() for line in open('input.txt') if line.strip()]
+    _data_file = sys.argv[sys.argv.index('-d') + 1] if '-d' in sys.argv else 'input.txt'
+    if not os.path.exists(_data_file):
+        if _data_file == 'input.txt':
+            import urllib.request
+            names_url = 'https://raw.githubusercontent.com/karpathy/makemore/988aa59/names.txt'
+            urllib.request.urlretrieve(names_url, 'input.txt')
+        else:
+            print(f"error: data file '{_data_file}' not found.")
+            sys.exit(1)
+    docs = [line.strip() for line in open(_data_file) if line.strip()]
     random.shuffle(docs)
     print(f"num docs: {len(docs)}")
 

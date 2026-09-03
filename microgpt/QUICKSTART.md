@@ -1,15 +1,19 @@
 # microgpt Quickstart
 
 A minimal GPT in pure Python (zero dependencies) that you can train, fine-tune, and
-align end-to-end in a few minutes. This runs the full pipeline — **pretrain → LoRA SFT →
-DPO/GRPO** — with live ASCII visualization (loss sparkline + attention heat map) at each stage.
+align end-to-end in a few minutes, with live ASCII visualization (loss sparkline +
+attention heat map) at each stage.
 
-Each stage feeds the next, so run them **in order**:
+**The pipeline is a branch, not a chain:** pretrain → SFT, then **either** DPO
+**or** GRPO off the same SFT checkpoint (not both in sequence). See the
+[README Pipeline section](README.md#pipeline-its-a-branch-not-a-chain) for the
+DPO-vs-GRPO tradeoff.
 
 ```bash
-python3 microgpt.py --viz 250            # pretrain on names      -> model.json
-python3 microgpt_sft.py --viz 250        # LoRA instruction SFT   -> model_sft.json
-python3 microgpt_dpo.py --viz 250 -n 1000  # DPO preference align -> model_dpo.json
+python3 microgpt.py --viz 250              # pretrain on names     -> model.json
+python3 microgpt_sft.py --viz 250          # LoRA instruction SFT  -> model_sft.json
+python3 microgpt_dpo.py --viz 250 -n 1000  # DPO align  (pick one) -> model_dpo.json
+python3 microgpt_grpo.py --viz 250         # GRPO align (pick one) -> model_grpo.json
 ```
 
 What the flags do:

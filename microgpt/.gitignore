@@ -5,6 +5,7 @@ model*.json
 train_*.log
 train_*.png
 *.png
+*_py.log
 
 # LaTeX build artifacts
 *.aux

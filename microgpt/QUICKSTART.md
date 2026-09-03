@@ -20,6 +20,11 @@ What the flags do:
 
 Notes:
 - Requires only **Python 3.6+** — no external packages.
+- **Datasets live in `data/`.** The example datasets and the `make_*.py`
+  generators read/write files under `data/`. The scripts' *built-in* defaults
+  (e.g. `input.txt`, `input_sft.txt`) still refer to the current directory, so
+  to use a dataset in `data/` pass it explicitly, e.g.
+  `-d data/input_sft_add1.txt` or `--offline data/input_grpo_add1.jsonl`.
 - Each run appends its console output to `train.log` (the live per-step counter stays on
   your terminal but is kept out of the log).
 - Run inference only from a saved model with `-i`, e.g. `python3 microgpt.py -i`.
@@ -40,13 +45,13 @@ The model learns `a+b` → `sum`. 100 pairs, fits easily in context, verifiable 
 
 ```bash
 # Step 1: Pretrain on addition strings (learns digit/operator character patterns)
-python3 microgpt.py -d input_sft_add1.txt --viz 250
+python3 microgpt.py -d data/input_sft_add1.txt --viz 250
 
 # Step 2: SFT on the completion task (learns a+b → answer)
-python3 microgpt_sft.py -d input_sft_add1.txt --viz 250
+python3 microgpt_sft.py -d data/input_sft_add1.txt --viz 250
 
 # Step 3: GRPO alignment (reinforce correct sums, suppress wrong ones)
-python3 microgpt_grpo.py --offline input_grpo_add1.jsonl --viz 250
+python3 microgpt_grpo.py --offline data/input_grpo_add1.jsonl --viz 250
 ```
 
 ### Double-Digit Addition
@@ -55,13 +60,13 @@ Harder — the model must learn carrying. 210 pairs, answers up to 3 digits.
 
 ```bash
 # Step 1: Pretrain
-python3 microgpt.py -d input_sft_add2.txt --viz 250
+python3 microgpt.py -d data/input_sft_add2.txt --viz 250
 
 # Step 2: SFT
-python3 microgpt_sft.py -d input_sft_add2.txt --viz 250
+python3 microgpt_sft.py -d data/input_sft_add2.txt --viz 250
 
 # Step 3: GRPO
-python3 microgpt_grpo.py --offline input_grpo_add2.jsonl --viz 250
+python3 microgpt_grpo.py --offline data/input_grpo_add2.jsonl --viz 250
 ```
 
 ### Pluralization Rules
@@ -70,13 +75,13 @@ The model learns English plural rules: `+s`, `+es`, `y→ies`, `f→ves`, irregu
 
 ```bash
 # Step 1: Pretrain
-python3 microgpt.py -d input_sft_plural.txt --viz 250
+python3 microgpt.py -d data/input_sft_plural.txt --viz 250
 
 # Step 2: SFT
-python3 microgpt_sft.py -d input_sft_plural.txt --viz 250
+python3 microgpt_sft.py -d data/input_sft_plural.txt --viz 250
 
 # Step 3: GRPO
-python3 microgpt_grpo.py --offline input_grpo_plural.jsonl --viz 250
+python3 microgpt_grpo.py --offline data/input_grpo_plural.jsonl --viz 250
 ```
 
 ### Pig Latin
@@ -84,14 +89,14 @@ python3 microgpt_grpo.py --offline input_grpo_plural.jsonl --viz 250
 Character-level string transformation: move consonant cluster to end + `ay`, or add `way`.
 
 ```bash
-# Step 1: Pretrain
-python3 microgpt.py -d input_sft_piglatin.txt --viz 250
+# Step 1: Pretrain on word forms (learns English character patterns)
+python3 microgpt.py -d data/input_piglatin.txt --viz 250
 
-# Step 2: SFT
-python3 microgpt_sft.py -d input_sft_piglatin.txt --viz 250
+# Step 2: SFT on the transformation (learns word → pig latin)
+python3 microgpt_sft.py -d data/input_piglatin_sft.txt --viz 250
 
 # Step 3: GRPO
-python3 microgpt_grpo.py --offline input_grpo_piglatin.jsonl --viz 250
+python3 microgpt_grpo.py --offline data/input_grpo_piglatin.jsonl --viz 250
 ```
 
 ### Airport Codes (Memorization)
@@ -101,11 +106,11 @@ Demonstrates memorization limits of tiny models.
 
 ```bash
 # Step 1: Pretrain on raw airport lines (6,072 entries, learns format)
-python3 microgpt.py -d airport_codes.txt --viz 250
+python3 microgpt.py -d data/input_airport_codes.txt --viz 250
 
 # Step 2: SFT on country+city → code
-python3 microgpt_sft.py -d input_airports_sft.txt --viz 250
+python3 microgpt_sft.py -d data/input_airports_sft.txt --viz 250
 
 # Step 3: GRPO alignment
-python3 microgpt_grpo.py --offline input_grpo_airports.jsonl --viz 250
+python3 microgpt_grpo.py --offline data/input_grpo_airports.jsonl --viz 250
 ```

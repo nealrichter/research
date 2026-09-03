@@ -252,9 +252,16 @@ if not inference_only:
         else:
             print(f"step {step+1:4d} / {num_steps:4d} | loss {loss.data:.4f}", end='\r')
 
-    # Save trained model weights to a JSON file
+    # Save trained model weights to a JSON file.
+    # 'format' declares how prompts are tokenized so downstream tools (eval,
+    # inference) don't have to guess. 'bos'/'sep' give the exact special-token
+    # ids (sep is null for pretrain, which has no separator token).
+    #   'pretrain' -> docs are '[BOS] chars [BOS]'; no separator token.
     with open('model.json', 'w') as f:
         json.dump({'vocab': uchars,
+                   'format': 'pretrain',
+                   'bos': BOS,
+                   'sep': None,
                    'config': {'n_layer': n_layer, 'n_embd': n_embd,
                               'block_size': block_size, 'n_head': n_head},
                    'weights': {k: [[p.data for p in row] for row in mat]

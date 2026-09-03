@@ -225,7 +225,18 @@ else:
     step = 0
     first_loss = last_loss = None  # end-to-end loss trajectory
 
+    # Early stopping: if the smoothed loss stays under a small threshold for a
+    # full epoch's worth of steps, further training is redundant, so stop.
+    loss_ema = None                       # exponential moving average of loss
+    ema_alpha = 0.05                      # smoothing factor
+    stop_threshold = 0.01                 # "converged" loss level
+    patience = max(len(sft_data), 50)     # steps below threshold before stopping
+    below_count = 0                       # consecutive steps under threshold
+    stopped_early = False
+
     for epoch in range(num_epochs):
+        if stopped_early:
+            break
         random.shuffle(sft_data)
         for instruction, response in sft_data:
             instr_tok = encode(instruction)
@@ -265,6 +276,18 @@ else:
             else:
                 print(f"  step {step:4d}/{total_steps} | loss {loss.data:.4f}", end='\r')
 
+            # Track smoothed loss for early stopping
+            loss_ema = loss.data if loss_ema is None else (1 - ema_alpha) * loss_ema + ema_alpha * loss.data
+            if loss_ema < stop_threshold:
+                below_count += 1
+            else:
+                below_count = 0
+            if below_count >= patience:
+                stopped_early = True
+                print(f"\n  early stop: smoothed loss {loss_ema:.4f} < {stop_threshold} "
+                      f"for {patience} steps (step {step}/{total_steps}). Converged.")
+                break
+
     # --- After SFT ---
     if first_loss is not None:
         _pct = (last_loss - first_loss) / first_loss * 100 if first_loss else 0.0
@@ -281,8 +304,14 @@ else:
                 for c in range(len(w_base[0])):
                     w_base[r][c].data += lora_scale * sum(w_up[r][k].data * w_down[k][c].data for k in range(lora_rank))
 
+    # 'format' declares the prompt tokenization; 'bos'/'sep' give the exact
+    # special-token ids so downstream tools never recompute them.
+    #   'sft' -> prompts are '[BOS] instruction [SEP] response'.
     with open('model_sft.json', 'w') as f:
         json.dump({'vocab': uchars,
+                   'format': 'sft',
+                   'bos': BOS,
+                   'sep': SEP,
                    'config': {'n_layer': n_layer, 'n_embd': n_embd, 'block_size': block_size, 'n_head': n_head},
                    'weights': {k: [[p.data for p in row] for row in mat] for k, mat in state_dict.items()}}, f)
     print(f"\nsaved model_sft.json (run: python3 microgpt_sft.py -i)")

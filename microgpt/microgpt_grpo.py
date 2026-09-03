@@ -622,6 +622,9 @@ else:
 
     with open('model_grpo.json', 'w') as f:
         json.dump({'vocab': uchars,
+                   'format': 'sft',
+                   'bos': BOS,
+                   'sep': SEP,
                    'config': {'n_layer': n_layer, 'n_embd': n_embd, 'block_size': block_size, 'n_head': n_head},
                    'weights': {k: [[p.data for p in row] for row in mat] for k, mat in state_dict.items()}}, f)
     print(f"\nsaved model_grpo.json (run: python3 microgpt_grpo.py -i)")

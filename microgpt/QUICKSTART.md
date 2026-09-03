@@ -5,9 +5,16 @@ align end-to-end in a few minutes, with live ASCII visualization (loss sparkline
 attention heat map) at each stage.
 
 **The pipeline is a branch, not a chain:** pretrain → SFT, then **either** DPO
-**or** GRPO off the same SFT checkpoint (not both in sequence). See the
-[README Pipeline section](README.md#pipeline-its-a-branch-not-a-chain) for the
-DPO-vs-GRPO tradeoff.
+**or** GRPO off the same SFT checkpoint (not both in sequence).
+
+```
+                                          ┌── DPO  ──► model_dpo.json   (preference pairs)
+pretrain ──► SFT ──► model_sft.json ──────┤
+ model.json    (instruction following)    └── GRPO ──► model_grpo.json  (rule-based reward)
+```
+
+See the [README Pipeline section](README.md#pipeline-its-a-branch-not-a-chain)
+for the DPO-vs-GRPO tradeoff.
 
 ```bash
 python3 microgpt.py --viz 250              # pretrain on names     -> model.json
